@@ -3,10 +3,10 @@ from setuptools import setup, find_packages
 
 setup(
     name='pykonkeio',
-    version='1.0.2',
+    version='1.0.3',
     keywords=('konke', 'iot'),
     description='Python library for interfacing with konke smart appliances',
-    long_description=open('README.md', 'rt').read(),
+    long_description=open('README.rst', 'rt').read(),
     author='jedmeng',
     author_email='jedm@jedm.cn',
     url='https://github.com/jedmeng/python-konkeio',
