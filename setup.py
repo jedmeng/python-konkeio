@@ -3,7 +3,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='pykonkeio',
-    version='1.0.3',
+    version='1.0.4',
     keywords=('konke', 'iot'),
     description='Python library for interfacing with konke smart appliances',
     long_description=open('README.rst', 'rt').read(),
@@ -12,7 +12,7 @@ setup(
     url='https://github.com/jedmeng/python-konkeio',
     license='MIT',
     install_requires=[
-        'pycrypto'
+        'pycryptodomex'
     ],
     packages=find_packages(),
     platforms='any',

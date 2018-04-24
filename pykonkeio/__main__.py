@@ -9,8 +9,9 @@ PORT = 27431
 
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-s.settimeout(1)
+s.settimeout(3)
 
+device_list = {}
 
 class KonekeDevice(object):
 
@@ -27,12 +28,14 @@ class KonekeDevice(object):
         cmd = 'lan_phone%{}%{}%{}%{}'.format(mac, password, param1, param2)
         message = utils.encrypt(cmd)
         s.sendto(message, address)
+        #print('send', cmd)
 
     @staticmethod
     def receive():
         data, address = s.recvfrom(128)
 
         incoming_message = utils.decrypt(data)
+        #print('receive', incoming_message)
         _, mac, password, action, type = incoming_message.split('%')
         ip, port = address
         return ip, mac, password, action, type
@@ -47,7 +50,6 @@ class KonekeDevice(object):
         datetime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
         KonekeDevice.send(ip, 'mac', 'nopassword', datetime, 'heart')
 
-        device_list = []
         while True:
             try:
                 result = KonekeDevice.receive()
@@ -57,15 +59,7 @@ class KonekeDevice(object):
             if callback is not None:
                 callback(*result)
 
-            if ip == result[0]:
-                return result
-
-            device_list.append(result)
-
-        if len(device_list) > 0:
-            return device_list
-        else:
-            raise socket.timeout
+            device_list[result[0]] = result
 
     def send_message(self, action, retry=3):
         if retry <= 0:
@@ -85,8 +79,13 @@ class KonekeDevice(object):
         return action
 
     def fetch_info(self):
+        if self.ip not in device_list:
+            self.search()
 
-        ip, mac, password, action, type = self.search(self.ip)
+        if self.ip not in device_list:
+            raise socket.error
+
+        ip, mac, password, action, type = device_list[self.ip]
 
         self.mac = mac
         self.password = password
@@ -99,8 +98,10 @@ class Switch(KonekeDevice):
     def __init__(self, ip, mac=None, password=None):
         self.status = 'offline'
         super(Switch, self).__init__(ip, mac, password, 'relay')
+        self.update()
 
-        if mac is None or password is None:
+    def update(self):
+        if self.mac is None or self.password is None:
             self.fetch_info()
         else:
             self.check()
@@ -121,6 +122,7 @@ class Switch(KonekeDevice):
     def check(self):
         try:
             result = self.send_message('check')
+            self.online = True
             self.status = result
         except socket.error:
             self.online = False
@@ -163,7 +165,6 @@ class Switch(KonekeDevice):
 
 def print_device(ip, mac, password, *o):
     print('ip: %s\nmac: %s\npassword: %s\n\n' % (ip, mac, password))
-    print(o)
 
 
 def main():
