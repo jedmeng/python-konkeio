@@ -13,7 +13,7 @@ Install
 
 .. code-block:: bash
 
-    pip install pykone
+    pip install pykoneio
 
 API Reference
 =============
@@ -45,22 +45,22 @@ CLI Command
 
    .. code-block:: bash
 
-       pykone search
+       koneio search
 
 -  check device status
 
    .. code-block:: bash
 
-       pykone check -a [device ip address]
+       koneio check -a [device ip address]
 
 -  turn on switch
 
    .. code-block:: bash
 
-       pykone open -a [device ip address]
+       koneio open -a [device ip address]
 
 -  turn off switch
 
    .. code-block:: bash
 
-       pykone close -a [device ip address]
+       koneio close -a [device ip address]

@@ -12,7 +12,7 @@ setup(
     url='https://github.com/jedmeng/python-konkeio',
     license='MIT',
     install_requires=[
-        'pycryptodomex'
+        'pycryptodomex==3.6.1'
     ],
     packages=find_packages(),
     platforms='any',
