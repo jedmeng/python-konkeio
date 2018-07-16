@@ -13,6 +13,7 @@ s.settimeout(3)
 
 device_list = {}
 
+
 class KonekeDevice(object):
 
     def __init__(self, ip, mac, password, device):
@@ -28,14 +29,14 @@ class KonekeDevice(object):
         cmd = 'lan_phone%{}%{}%{}%{}'.format(mac, password, param1, param2)
         message = utils.encrypt(cmd)
         s.sendto(message, address)
-        #print('send', cmd)
+        # print('send', cmd)
 
     @staticmethod
     def receive():
         data, address = s.recvfrom(128)
 
         incoming_message = utils.decrypt(data)
-        #print('receive', incoming_message)
+        # print('receive', incoming_message)
         _, mac, password, action, type = incoming_message.split('%')
         ip, port = address
         return ip, mac, password, action, type
@@ -81,6 +82,10 @@ class KonekeDevice(object):
     def fetch_info(self):
         if self.ip not in device_list:
             self.search()
+
+        # 特殊情况下广播包可能被屏蔽
+        if self.ip not in device_list:
+            self.search(self.ip)
 
         if self.ip not in device_list:
             raise socket.error
