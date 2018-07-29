@@ -37,9 +37,10 @@ class KonekeDevice(object):
 
         incoming_message = utils.decrypt(data)
         # print('receive', incoming_message)
-        _, mac, password, action, type = incoming_message.split('%')
+
+        _, mac, password, action, device_type = incoming_message.split('%')
         ip, port = address
-        return ip, mac, password, action, type
+        return ip, mac, password, action, device_type
 
     """
         搜索设备
@@ -70,11 +71,11 @@ class KonekeDevice(object):
 
         while True:
             try:
-                ip, mac, _, action, type = self.receive()
+                ip, mac, _, action, device_type = self.receive()
             except socket.timeout:
                 return self.send_message(action, retry-1)
 
-            if mac == self.mac and type == 'rack':
+            if mac == self.mac and device_type == 'rack':
                 break
 
         return action
@@ -90,12 +91,12 @@ class KonekeDevice(object):
         if self.ip not in device_list:
             raise socket.error
 
-        ip, mac, password, action, type = device_list[self.ip]
+        ip, mac, password, action, device_type = device_list[self.ip]
 
         self.mac = mac
         self.password = password
 
-        return action, type
+        return action, device_type
 
 
 class Switch(KonekeDevice):
@@ -113,7 +114,7 @@ class Switch(KonekeDevice):
 
     def fetch_info(self):
         try:
-            action, type = super(Switch, self).fetch_info()
+            action, device_type = super(Switch, self).fetch_info()
             self.status = re.sub(r'#.*$', "", action)
         except socket.error:
             self.online = False
@@ -168,7 +169,7 @@ class Switch(KonekeDevice):
         return result == 'close'
 
 
-def print_device(ip, mac, password, *o):
+def print_device(ip, mac, password):
     print('ip: %s\nmac: %s\npassword: %s\n\n' % (ip, mac, password))
 
 
@@ -188,13 +189,13 @@ def main():
     else:
         if args.address is None:
             print('IP address is empty.')
-            exit(0)
+            return
 
         if args.device == 'switch':
             device = Switch(args.address)
         else:
             print('device %s not support' % args.device)
-            exit(0)
+            return
 
         if args.action == 'check':
             print('status: %s' % device.status)
