@@ -169,7 +169,7 @@ class Switch(KonekeDevice):
         return result == 'close'
 
 
-def print_device(ip, mac, password):
+def print_device(ip, mac, password, action, device_type):
     print('ip: %s\nmac: %s\npassword: %s\n\n' % (ip, mac, password))
 
 
