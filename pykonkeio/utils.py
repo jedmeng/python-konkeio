@@ -1,4 +1,4 @@
-from Cryptodome.Cipher import AES
+from Crypto.Cipher import AES
 
 KEY = b'fdsl;mewrjope456fds4fbvfnjwaugfo'
 
