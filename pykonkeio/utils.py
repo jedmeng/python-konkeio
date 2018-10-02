@@ -1,3 +1,4 @@
+import logging
 from Crypto.Cipher import AES
 
 KEY = b'fdsl;mewrjope456fds4fbvfnjwaugfo'
@@ -17,3 +18,15 @@ def decrypt(message):
     aes = AES.new(KEY, AES.MODE_ECB)
     plaintext = aes.decrypt(message)
     return str(plaintext, encoding="utf-8").rstrip('\0')
+
+
+def logger():
+    return logging.getLogger("konke")
+
+
+def check_number(value, low, high):
+    if value is None:
+        raise ValueError
+    value = int(value)
+    if value < low or value > high:
+        raise ValueError

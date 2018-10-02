@@ -1,1 +1,5 @@
-from .__main__ import KonekeDevice, Switch
+from .error import *
+from .device.kblub import KBlub
+from .device.klight import KLight
+from .device.switch import Switch
+
