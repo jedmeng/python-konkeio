@@ -7,16 +7,30 @@ class KonkeError(Exception):
 
 
 class Timeout(KonkeError):
-    pass
+    def __init__(self, message='request time out'):
+        super().__init__(message)
 
 
 class DeviceOffline(KonkeError):
-    pass
+    def __init__(self, message='device is offline'):
+        super().__init__(message)
 
 
 class ErrorMessageFormat(KonkeError):
-    pass
+    def __init__(self, message='wrong message'):
+        super().__init__(message)
+
+
+class IllegalDevice(KonkeError):
+    def __init__(self, message='device not support'):
+        super().__init__(message)
+
+
+class IllegalAction(KonkeError):
+    def __init__(self, message='action not support'):
+        super().__init__(message)
 
 
 class IllegalValue(KonkeError):
-    pass
+    def __init__(self, message='illegal value'):
+        super().__init__(message)

@@ -4,7 +4,7 @@ from .. import error
 PORT = 27431
 
 
-class KonekeDevice(object):
+class BaseDevice(object):
 
     def __init__(self, ip, device_type):
         self.manager = manager.Manager.get_instance()
@@ -12,10 +12,9 @@ class KonekeDevice(object):
         self.device_type = device_type
         self.mac = None
         self.password = None
-        self.status = None
         self.online = False
 
-    def update(self):
+    def fetch_info(self):
         t = self.manager.get_device(self.ip)
 
         if t is None:
@@ -26,7 +25,7 @@ class KonekeDevice(object):
 
     def send_message(self, action, message_type=None, retry=2):
         if not self.online:
-            self.update()
+            self.fetch_info()
 
         if not self.online:
             raise error.DeviceOffline('device is offline')
@@ -44,3 +43,6 @@ class KonekeDevice(object):
 
             if mac == self.mac and device_type[-3:] == 'ack':
                 return action
+
+    def do(self, action, value=None):
+        raise error.IllegalAction()
