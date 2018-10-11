@@ -33,7 +33,7 @@ class BaseMul(BaseDevice):
         elif action == 'turn_off_all':
             self.turn_off_all()
         else:
-            super().do(action, value)
+            return super().do(action, value)
 
     """
         获取状态

@@ -32,7 +32,7 @@ class Mul(BaseMul):
         elif action == 'turn_off_usb' and usb_device_id:
             self.turn_off_usb(usb_device_id)
         else:
-            super().do(action, value)
+            return super().do(action, value)
 
     """
         获取状态

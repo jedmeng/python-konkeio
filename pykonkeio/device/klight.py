@@ -21,7 +21,7 @@ class KLight(BaseBinary):
         elif action == 'set_color':
             self.set_color(*value.split(','))
         else:
-            super().do(action, value)
+            return super().do(action, value)
 
     """
         获取状态

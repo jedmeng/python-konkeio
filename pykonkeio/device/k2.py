@@ -22,7 +22,7 @@ class K2(BaseBinary):
         elif action == 'turn_off_light':
             self.turn_off_light()
         else:
-            super().do(action, value)
+            return super().do(action, value)
 
     def update(self):
         super().update()

@@ -23,7 +23,7 @@ class KBlub(BaseBinary):
         elif action == 'set_color_temperature' or action == 'set_ct':
             self.set_ct(value)
         else:
-            super().do(action, value)
+            return super().do(action, value)
     """
         获取状态
         req: lan_phone%28-d9-8a-xx-xx-xx%XXXXXXXX%check%kbulb
