@@ -9,11 +9,11 @@ logging.basicConfig(level=logging.WARN,
                     datefmt='%Y/%m/%d %H:%M:%S',
                     format='%(asctime)s %(levelname)s %(message)s')
 
-example = '''
+help_content = '''
 usage: konkeio [action] [device] [address] [value] [--verbose]
 
 Supported devices and actions supported by each device:
-global: search
+global: search help
 k2:     get_status turn_[on/off] turn_[on/off]_usb turn_[on/off]_light
 minik:  get_status turn_[on/off]
 micmul: get_count get_status_all get_status[1/2/3/4] turn_[on/off]_all turn_[on/off]_socket[1/2/3/4]
@@ -23,12 +23,13 @@ klight: get_status get_brightness get_color turn_[on/off] set_brightness set_col
 kblub:  get_status get_brightness get_ct turn_[on/off] set_brightness set_ct
 
 * each action starts with 'set_' must provide a value parameter
-value format:
+
+Value Format:
 color:      r,g,b
 ct:         2700-6500
 brightness: 0-100
 
-example:
+Example:
 konkeio search
 konkeio turn_on minik 192.168.0.64
 konkeio get_status minik 192.168.0.64
@@ -50,10 +51,10 @@ def print_device(ip, mac, password, action, device_type):
 
 
 def main():
-    parser = argparse.ArgumentParser(prog="konkeio", epilog=example,
+    parser = argparse.ArgumentParser(prog="konkeio", epilog=help_content,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('action', help='action name')
-    parser.add_argument('device', help='device type')
+    parser.add_argument('device', help='device type', nargs='?')
     parser.add_argument('address', help='device ip address', nargs='?')
     parser.add_argument('value', help='action value', nargs='?')
     parser.add_argument('-v', dest='verbose', help='show debug', default=False, action="store_true")
@@ -65,16 +66,20 @@ def main():
 
     if args.action == 'search':
         try:
-            manager.Manager.get_instance().search(ip=args.address, callback=print_device)
+            ip = args.device or '255.255.255.255'
+            manager.Manager.get_instance().search(ip=ip, callback=print_device)
         except error.Timeout:
             pass
         except error.KonkeError as err:
             print(err)
+    elif args.action == 'help':
+        print(help_content)
     else:
         try:
-            if args.address is None:
-                print('IP address is empty.')
-                return
+            if args.address is None or args.device is None:
+                print('Usage: konkeio [action] [device] [address] [value] [--verbose]')
+                print("Try 'konkeio help' for more information.")
+                exit(0)
 
             if args.device == 'k2':
                 device = K2(args.address)
