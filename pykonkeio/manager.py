@@ -33,7 +33,11 @@ class Manager:
             raise error.Timeout
 
         incoming_message = utils.decrypt(data)
-        logger.debug('receive %s', incoming_message)
+        logger.debug('receive %s', incoming_message or '(empty)')
+
+        if len(incoming_message.split('%')) != 5:
+            logger.error('incorrect response %s', incoming_message)
+            return None
 
         sender, mac, password, action, device_type = incoming_message.split('%')
 
@@ -50,6 +54,7 @@ class Manager:
     """
     def search(self, ip='255.255.255.255', callback=None):
         datetime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+        self.send(ip, 'mac', 'nopassword', datetime, 'heart')
         self.send(ip, 'mac', 'nopassword', datetime, 'heart')
 
         while True:

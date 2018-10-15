@@ -1,9 +1,9 @@
-from .basebinary import BaseBinary
+from .basetoggle import BaseToggle
 from .. import utils
 from .. import error
 
 
-class KLight(BaseBinary):
+class KLight(BaseToggle):
 
     def __init__(self, ip):
         self.color = [0, 0, 0]

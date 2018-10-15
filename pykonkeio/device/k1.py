@@ -1,5 +1,5 @@
 from .basetoggle import BaseToggle
 
 
-class MiniK(BaseToggle):
+class K1(BaseToggle):
     pass

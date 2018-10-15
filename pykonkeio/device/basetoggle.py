@@ -1,7 +1,7 @@
 from .base import BaseDevice
 
 
-class BaseBinary(BaseDevice):
+class BaseToggle(BaseDevice):
 
     def __init__(self, ip, device_type='relay'):
         super().__init__(ip, device_type)

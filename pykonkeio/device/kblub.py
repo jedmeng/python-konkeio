@@ -1,9 +1,9 @@
-from .basebinary import BaseBinary
+from .basetoggle import BaseToggle
 from .. import utils
 from .. import error
 
 
-class KBlub(BaseBinary):
+class KBlub(BaseToggle):
 
     def __init__(self, ip):
         self.brightness = 0

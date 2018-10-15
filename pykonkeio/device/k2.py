@@ -1,7 +1,7 @@
-from .basebinary import BaseBinary
+from .basetoggle import BaseToggle
 
 
-class K2(BaseBinary):
+class K2(BaseToggle):
 
     def __init__(self, ip):
         self.light_status = 'close'
@@ -68,3 +68,13 @@ class K2(BaseBinary):
         if self.light_status != 'close':
             self.send_message('close', 'light')
             self.light_status = 'close'
+
+    """
+        获取实时功率
+        req: lan_phone%28-d9-8a-xx-xx-xx%XXXXXXXX%check%power
+        res: lan_device%28-d9-8a-xx-xx-xx%nopassword%close%pack
+    """
+    def get_power(self):
+        res = self.send_message('check', 'power')
+        _, _, power = res.split('#')
+        return power

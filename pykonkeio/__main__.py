@@ -74,6 +74,10 @@ def main():
             print(err)
     elif args.action == 'help':
         print(help_content)
+    elif args.action == 'send':
+        from .device.base import BaseDevice
+        device = BaseDevice(args.device, '')
+        print(device.send_message(args.address, args.value))
     else:
         try:
             if args.address is None or args.device is None:
