@@ -11,28 +11,28 @@ class KLight(BaseToggle):
         self.m = 0
         super().__init__(ip, 'klight')
 
-    def do(self, action, value=None):
+    async def do(self, action, value=None):
         if action == 'get_brightness':
             return self.brightness
         elif action == 'get_color':
             return self.color
         elif action == 'set_brightness':
-            self.set_brightness(value)
+            await self.set_brightness(value)
         elif action == 'set_color':
-            self.set_color(*value.split(','))
+            await self.set_color(*value.split(','))
         else:
-            return super().do(action, value)
+            return await super().do(action, value)
 
     """
         获取状态
         req: lan_phone%28-d9-8a-xx-xx-xx%XXXXXXXX%check%klight
         res: lan_device%28-d9-8a-xx-xx-xx%nopassword%open#x#x#x#x#1,x#1&#x#x#x#x#2,x#1&#x#x#x#x#3,x#1&#x#x#x#x#5,x#1%klack
     """
-    def update(self):
+    async def update(self):
         if not self.online:
             super().update()
         try:
-            [m1, m2, *_] = self.send_message('check').split('&')
+            [m1, m2, *_] = (await self.send_message('check')).split('&')
 
             [self.status, *_] = m1.split('#')
 
@@ -48,7 +48,7 @@ class KLight(BaseToggle):
         调整亮度
         req: lan_phone%28-d9-8a-xx-xx-xx%XXXXXXXX%set#r#g#b#w#2%klight
     """
-    def set_brightness(self, w):
+    async def set_brightness(self, w):
         try:
             utils.check_number(w, 0, 100)
         except ValueError:
@@ -56,14 +56,14 @@ class KLight(BaseToggle):
 
         if self.brightness != int(w):
             [r, g, b] = self.color
-            self.send_message('set#%s#%s#%s#%s#1,%s#1' % (r, g, b, w, self.m))
+            await self.send_message('set#%s#%s#%s#%s#1,%s#1' % (r, g, b, w, self.m))
             self.brightness = int(w)
 
     """
         调整颜色
         req: lan_phone%28-d9-8a-xx-xx-xx%XXXXXXXX%open%light
     """
-    def set_color(self, r=None, g=None, b=None):
+    async def set_color(self, r=None, g=None, b=None):
         try:
             utils.check_number(r, 0, 255)
             utils.check_number(g, 0, 255)
@@ -72,5 +72,5 @@ class KLight(BaseToggle):
             raise error.IllegalValue('illegal color value')
 
         if self.color != [int(r), int(g), int(b)]:
-            self.send_message('set#%s#%s#%s#%s#1,%s#1' % (r, g, b, self.brightness, self.m))
+            await self.send_message('set#%s#%s#%s#%s#1,%s#1' % (r, g, b, self.brightness, self.m))
             self.color = [int(r), int(g), int(b)]

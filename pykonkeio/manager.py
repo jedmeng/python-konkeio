@@ -1,85 +1,66 @@
-import socket
 import time
 import logging
+import asyncio
 
 from . import error
-from . import utils
+from . import socket
+from .device import *
 
-PORT = 27431
+_LOGGER = logging.getLogger('manager')
+_devices = {}
+_device_info = {}
 
-logger = logging.getLogger('konkeio')
+
+async def search(ip='255.255.255.255', callback=None):
+    datetime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
+    socket.send(ip, 'mac', 'nopassword', datetime, 'heart')
+
+    future = asyncio.Future(loop=socket.loop)
+
+    def message_handler(*data):
+        if data[4] != 'hack':
+            return
+        if callback is not None:
+            callback(*data)
+        if ip == data[0]:
+            future.set_result(data)
+            _device_info[data[0]] = data
+
+    socket.add_message_handler(message_handler)
+    try:
+        return await asyncio.wait_for(future, timeout=2)
+    except asyncio.TimeoutError:
+        raise error.Timeout
+    finally:
+        socket.remove_message_handler(message_handler)
 
 
-class Manager:
-    instance = None
+def get_device(ip, device_type=None):
+    if ip in _devices:
+        return _devices[ip]
 
-    def __init__(self):
-        self.s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-        self.s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
-        self.s.settimeout(3)
-        self.device_list = {}
+    if device_type is None:
+        device = BaseToggle(ip)
+    elif device_type == 'k2':
+        device = K2(ip)
+    elif device_type == 'minik':
+        device = MiniK(ip)
+    elif device_type == 'micmul':
+        device = MicMul(ip)
+    elif device_type == 'mul':
+        device = Mul(ip)
+    elif device_type == 'klight':
+        device = KLight(ip)
+    elif device_type == 'kbulb':
+        device = KBlub(ip)
+    else:
+        raise error.IllegalDevice('device %s not support' % device_type)
 
-    def send(self, ip, mac, password, param1, param2):
-        address = (ip, PORT)
-        cmd = 'lan_phone%%%s%%%s%%%s%%%s' % (mac, password, param1, param2)
-        message = utils.encrypt(cmd)
-        self.s.sendto(message, address)
-        logger.debug('send %s', cmd)
+    _devices[ip] = device
+    return device
 
-    def receive(self):
-        try:
-            data, address = self.s.recvfrom(128)
-        except socket.timeout:
-            raise error.Timeout
 
-        incoming_message = utils.decrypt(data)
-        logger.debug('receive %s', incoming_message or '(empty)')
-
-        if len(incoming_message.split('%')) != 5:
-            logger.error('incorrect response %s', incoming_message)
-            return None
-
-        sender, mac, password, action, device_type = incoming_message.split('%')
-
-        if sender != 'lan_device':
-            return self.receive()
-
-        ip, _ = address
-        return ip, mac, password, action, device_type
-
-    """
-        搜索设备
-        req: lan_phone%mac%nopassword%2018-04-21-16:26:04%heart
-        res: lan_device%28-d9-8a-xx-xx-xx%XXXXXXXX%close#hv2.0.3#sv2.0.7%hack
-    """
-    def search(self, ip='255.255.255.255', callback=None):
-        datetime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
-        self.send(ip, 'mac', 'nopassword', datetime, 'heart')
-        self.send(ip, 'mac', 'nopassword', datetime, 'heart')
-
-        while True:
-            try:
-                result = self.receive()
-            except socket.timeout:
-                break
-
-            if callback is not None:
-                callback(*result)
-
-            self.device_list[result[0]] = result
-
-            if result[0] == ip:
-                break
-
-    def get_device(self, ip):
-        if ip in self.device_list:
-            return self.device_list[ip]
-
-        self.search(ip)
-        return self.device_list[ip]
-
-    @staticmethod
-    def get_instance():
-        if Manager.instance is None:
-            Manager.instance = Manager()
-        return Manager.instance
+async def get_device_info(ip):
+    if ip not in _device_info:
+        await search(ip)
+    return _device_info[ip]

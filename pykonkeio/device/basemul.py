@@ -11,7 +11,7 @@ class BaseMul(BaseDevice):
     def socket_count(self):
         return 0
 
-    def do(self, action, value=None):
+    async def do(self, action, value=None):
         device_id = action[-1:0]
         if device_id.isnumeric() and 0 < int(device_id) <= self.socket_count:
             device_id = int(device_id - 1)
@@ -25,15 +25,15 @@ class BaseMul(BaseDevice):
         elif action[:-1] == 'get_status' and device_id:
             return 'on' if self.status[device_id] == 'open' else 'off'
         elif action == 'turn_on_socket' and device_id:
-            self.turn_on(device_id)
+            await self.turn_on(device_id)
         elif action == 'turn_off_socket' and device_id:
-            self.turn_off(device_id)
+            await self.turn_off(device_id)
         elif action == 'turn_on_all':
-            self.turn_on_all()
+            await self.turn_on_all()
         elif action == 'turn_off_all':
-            self.turn_off_all()
+            await self.turn_off_all()
         else:
-            return super().do(action, value)
+            return await super().do(action, value)
 
     """
         获取状态
@@ -41,8 +41,8 @@ class BaseMul(BaseDevice):
         res: lan_device%28-d9-8a-xx-xx-xx%nopassword%open1,close2,open3,close4%rack
     """
 
-    def update(self):
-        for t, index in enumerate(self.send_message('check').split(',')):
+    async def update(self):
+        for t, index in enumerate((await self.send_message('check')).split(',')):
             self.status[index] = t[:-1]
 
     """
@@ -51,9 +51,9 @@ class BaseMul(BaseDevice):
         res: lan_device%28-d9-8a-xx-xx-xx%nopassword%open%rack
     """
 
-    def turn_on(self, index):
+    async def turn_on(self, index):
         if self.status[index] != 'open':
-            self.send_message('open' + str(index + 1))
+            await self.send_message('open' + str(index + 1))
             self.status[index] = 'open'
 
     """
@@ -62,9 +62,9 @@ class BaseMul(BaseDevice):
         res: lan_device%28-d9-8a-xx-xx-xx%nopassword%close%rack
     """
 
-    def turn_off(self, index):
+    async def turn_off(self, index):
         if self.status[index] != 'close':
-            self.send_message('close' + str(index + 1))
+            await self.send_message('close' + str(index + 1))
             self.status[index] = 'close'
 
     """
@@ -73,9 +73,9 @@ class BaseMul(BaseDevice):
         res: lan_device%28-d9-8a-xx-xx-xx%nopassword%close%rack
     """
 
-    def turn_on_all(self):
+    async def turn_on_all(self):
         if any(status != 'open' for status in self.status):
-            self.send_message('openall')
+            await self.send_message('openall')
             for index, _ in enumerate(self.status):
                 self.status[index] = 'open'
 
@@ -85,8 +85,8 @@ class BaseMul(BaseDevice):
         res: lan_device%28-d9-8a-xx-xx-xx%nopassword%close%rack
     """
 
-    def turn_off_all(self):
+    async def turn_off_all(self):
         if any(status != 'close' for status in self.status):
-            self.send_message('closeall')
+            await self.send_message('closeall')
             for index, _ in enumerate(self.status):
                 self.status[index] = 'close'
