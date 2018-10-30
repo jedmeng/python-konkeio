@@ -29,5 +29,6 @@ class MockK2(MockBaseDevice):
             self.send_message(src, self.usb_status, 'uack')
         elif action == 'check' and device_type == 'power':
             self.last_power = random.randint(0, 3000) / 100
-            self.send_message(src, self.last_power, 'pack')
+            power = 'dl_module#power#%.2f' % self.last_power
+            self.send_message(src, power, 'pack')
 

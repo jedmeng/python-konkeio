@@ -13,6 +13,8 @@ class K2(BaseToggle):
             return 'on' if self.usb_status == 'open' else 'off'
         elif action == 'get_light_status':
             return 'on' if self.light_status == 'open' else 'off'
+        elif action == 'get_power':
+            return await self.get_power()
         elif action == 'turn_on_usb':
             await self.turn_on_usb()
         elif action == 'turn_off_usb':

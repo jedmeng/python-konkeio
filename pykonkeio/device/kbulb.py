@@ -54,7 +54,7 @@ class KBulb(BaseToggle):
             raise error.IllegalValue('brightness should between 0 and 100')
 
         if self.brightness != int(w):
-            self.set_mode(1)
+            await self.set_mode(1)
             await self.send_message('set#lum#%s' % w)
             self.brightness = int(w)
 
@@ -69,7 +69,7 @@ class KBulb(BaseToggle):
             raise error.IllegalValue('illegal color temperature')
 
         if self.ct != int(ct):
-            self.set_mode(1)
+            await self.set_mode(1)
             await self.send_message('set#ctp#%s' % ct)
             self.ct = int(ct)
 

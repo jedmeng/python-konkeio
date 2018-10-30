@@ -1,4 +1,5 @@
 import pytest
+import re
 from ..mock.mock_k2 import MockK2
 from pykonkeio.device.k2 import K2
 from pykonkeio import manager as client_manager
@@ -98,9 +99,9 @@ async def test_check_power(server: MockK2, client: K2):
 
     await client.turn_on()
     client_power = await client.get_power()
-    assert type(client_power) == float
+    assert re.match(r'^\d+\.\d{2}$', client_power)
     if server:
-        assert server.last_power == client_power
+        assert float(server.last_power) == float(client_power)
 
 
 # noinspection 801,PyShadowingNames

@@ -1,4 +1,5 @@
 .idea
+*.pyc
 venv
 __pycache__
 dist
