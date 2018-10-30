@@ -16,7 +16,7 @@ Konke remote-control devices.
 
 ### Light
 - KLight (LED with RGB color) `klight`
-- KBlum/K2Light `kblub`
+- KBlum/K2Light `kbulb`
 
 ## Install
 
@@ -72,7 +72,7 @@ Konke remote-control devices.
     - turn_off()
     - set_color()
     - set_brightness()
-- KBlub
+- KBulb
     - online
     - status
     - ct
@@ -112,7 +112,7 @@ micmul: get_count get_status_all get_status[1/2/3/4] turn_[on/off]_all turn_[on/
 mul:    get_count get_status_all get_status[1/2/3] get_usb_count get_usb_status_all get_usb_status[1/2]
         turn_[on/off]_all turn_[on/off]_socket[1/2/3] turn_[on/off]_usb[1/2]
 klight: get_status get_brightness get_color turn_[on/off] set_brightness set_color
-kblub:  get_status get_brightness get_ct turn_[on/off] set_brightness set_ct
+kbulb:  get_status get_brightness get_ct turn_[on/off] set_brightness set_ct
 
 * each action starts with 'set_' must provide a value parameter
 value format:
@@ -132,6 +132,6 @@ konkeio get_status2 mul 192.168.0.64
 konkeio turn_off_all mul 192.168.0.64
 konkeio get_brightness klight 192.168.0.64
 konkeio set_color klight 192.168.0.64 255,255,0
-konkeio set_ct blub 192.168.0.64 3400
+konkeio set_ct kbulb 192.168.0.64 3400
 konkeio turn_off bulb 192.168.0.64
 ```

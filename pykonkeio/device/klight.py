@@ -28,18 +28,18 @@ class KLight(BaseToggle):
         req: lan_phone%28-d9-8a-xx-xx-xx%XXXXXXXX%check%klight
         res: lan_device%28-d9-8a-xx-xx-xx%nopassword%open#x#x#x#x#1,x#1&#x#x#x#x#2,x#1&#x#x#x#x#3,x#1&#x#x#x#x#5,x#1%klack
     """
-    async def update(self):
+    async def update(self, **kwargs):
         if not self.online:
-            super().update()
+            super().update(**kwargs)
         try:
-            [m1, m2, *_] = (await self.send_message('check')).split('&')
+            m1, m2, *_ = (await self.send_message('check', **kwargs)).split('&')
 
-            [self.status, *_] = m1.split('#')
+            self.status, *_ = m1.split('#')
 
-            [_, r, g, b, w, t, _] = m2.split('#')
+            _, r, g, b, w, t, _ = m2.split('#')
             self.color = [int(r), int(g), int(b)]
             self.brightness = int(w)
-            [_, m] = t.split(',')
+            m, _ = t.split(',')
             self.m = int(m)
         except ValueError:
             raise error.ErrorMessageFormat
@@ -48,7 +48,7 @@ class KLight(BaseToggle):
         调整亮度
         req: lan_phone%28-d9-8a-xx-xx-xx%XXXXXXXX%set#r#g#b#w#2%klight
     """
-    async def set_brightness(self, w):
+    async def set_brightness(self, w, **kwargs):
         try:
             utils.check_number(w, 0, 100)
         except ValueError:
@@ -56,14 +56,14 @@ class KLight(BaseToggle):
 
         if self.brightness != int(w):
             [r, g, b] = self.color
-            await self.send_message('set#%s#%s#%s#%s#1,%s#1' % (r, g, b, w, self.m))
+            await self.send_message('set#%s#%s#%s#%s#1,%s#1' % (r, g, b, w, self.m), **kwargs)
             self.brightness = int(w)
 
     """
         调整颜色
         req: lan_phone%28-d9-8a-xx-xx-xx%XXXXXXXX%open%light
     """
-    async def set_color(self, r=None, g=None, b=None):
+    async def set_color(self, r=None, g=None, b=None, **kwargs):
         try:
             utils.check_number(r, 0, 255)
             utils.check_number(g, 0, 255)
@@ -72,5 +72,5 @@ class KLight(BaseToggle):
             raise error.IllegalValue('illegal color value')
 
         if self.color != [int(r), int(g), int(b)]:
-            await self.send_message('set#%s#%s#%s#%s#1,%s#1' % (r, g, b, self.brightness, self.m))
+            await self.send_message('set#%s#%s#%s#%s#1,%s#1' % (r, g, b, self.brightness, self.m), **kwargs)
             self.color = [int(r), int(g), int(b)]

@@ -5,7 +5,6 @@ import asyncio
 from . import socket
 from . import manager
 from . import error
-from .device import *
 
 help_content = '''
 usage: konkeio [action] [device] [address] [value] [--verbose]
@@ -18,7 +17,7 @@ micmul: get_count get_status_all get_status[1/2/3/4] turn_[on/off]_all turn_[on/
 mul:    get_count get_status_all get_status[1/2/3] get_usb_count get_usb_status_all get_usb_status[1/2] 
         turn_[on/off]_all turn_[on/off]_socket[1/2/3] turn_[on/off]_usb[1/2] 
 klight: get_status get_brightness get_color turn_[on/off] set_brightness set_color
-kblub:  get_status get_brightness get_ct turn_[on/off] set_brightness set_ct
+kbulb:  get_status get_brightness get_ct turn_[on/off] set_brightness set_ct
 
 * each action starts with 'set_' must provide a value parameter
 
@@ -39,7 +38,7 @@ konkeio get_status2 mul 192.168.0.64
 konkeio turn_off_all mul 192.168.0.64
 konkeio get_brightness klight 192.168.0.64
 konkeio set_color klight 192.168.0.64 255,255,0
-konkeio set_ct blub 192.168.0.64 3400
+konkeio set_ct bulb 192.168.0.64 3400
 konkeio turn_off bulb 192.168.0.64
 '''
 
@@ -91,8 +90,10 @@ async def main():
         except error.KonkeError as err:
             print(err)
 
+    current = asyncio.Task.current_task()
     for task in asyncio.Task.all_tasks():
-        task.cancel()
+        if task != current:
+            task.cancel()
 
 
 if __name__ == "__main__":

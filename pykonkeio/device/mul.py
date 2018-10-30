@@ -7,6 +7,7 @@ SOCKET_COUNT = 3
 class Mul(BaseMul):
 
     def __init__(self, ip):
+        self.usb_count = USB_COUNT
         self.usb_status = ['close'] * USB_COUNT
         super().__init__(ip, 'relay')
 
@@ -39,10 +40,10 @@ class Mul(BaseMul):
         req: lan_phone%28-d9-8a-XX-XX-XX%XXXXXXXX%check%usb
         res: lan_device%28-d9-8a-xx-xx-xx%nopassword%open1,close2%uack
     """
-    async def update(self):
-        super().update()
+    async def update(self, **kwargs):
+        await super().update(**kwargs)
 
-        for t, index in enumerate((await self.send_message('check', 'usb')).split(',')):
+        for index, t in enumerate((await self.send_message('check', 'usb', **kwargs)).split(',')):
             self.usb_status[index] = t[:-1]
 
     """
@@ -50,9 +51,9 @@ class Mul(BaseMul):
         req: lan_phone%28-d9-8a-xx-xx-xx%XXXXXXXX%openX%usb
         res: lan_device%28-d9-8a-xx-xx-xx%nopassword%open%uack
     """
-    async def turn_on_usb(self, index):
+    async def turn_on_usb(self, index, **kwargs):
         if self.usb_status[index] != 'open':
-            await self.send_message('open' + str(index + 1, 'usb'))
+            await self.send_message('open' + str(index + 1), 'usb', **kwargs)
             self.usb_status[index] = 'open'
 
     """
@@ -60,7 +61,7 @@ class Mul(BaseMul):
         req: lan_phone%28-d9-8a-xx-xx-xx%XXXXXXXX%open%usb
         res: lan_device%28-d9-8a-xx-xx-xx%nopassword%close%uack
     """
-    async def turn_off_usb(self, index):
+    async def turn_off_usb(self, index, **kwargs):
         if self.usb_status[index] != 'close':
-            await self.send_message('close' + str(index + 1, 'usb'))
+            await self.send_message('close' + str(index + 1), 'usb', **kwargs)
             self.usb_status[index] = 'close'

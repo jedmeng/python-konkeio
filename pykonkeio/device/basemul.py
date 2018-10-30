@@ -5,7 +5,7 @@ class BaseMul(BaseDevice):
 
     def __init__(self, ip, device_type='relay'):
         super().__init__(ip, device_type)
-        self.status = ['close'] * self.socket_count
+        self.status = list(['close'] * self.socket_count)
 
     @property
     def socket_count(self):
@@ -41,8 +41,9 @@ class BaseMul(BaseDevice):
         res: lan_device%28-d9-8a-xx-xx-xx%nopassword%open1,close2,open3,close4%rack
     """
 
-    async def update(self):
-        for t, index in enumerate((await self.send_message('check')).split(',')):
+    async def update(self, **kwargs):
+        res = await self.send_message('check', **kwargs)
+        for index, t in enumerate(res.split(',')):
             self.status[index] = t[:-1]
 
     """
@@ -51,9 +52,9 @@ class BaseMul(BaseDevice):
         res: lan_device%28-d9-8a-xx-xx-xx%nopassword%open%rack
     """
 
-    async def turn_on(self, index):
+    async def turn_on(self, index, **kwargs):
         if self.status[index] != 'open':
-            await self.send_message('open' + str(index + 1))
+            await self.send_message('open' + str(index + 1), **kwargs)
             self.status[index] = 'open'
 
     """
@@ -62,9 +63,9 @@ class BaseMul(BaseDevice):
         res: lan_device%28-d9-8a-xx-xx-xx%nopassword%close%rack
     """
 
-    async def turn_off(self, index):
+    async def turn_off(self, index, **kwargs):
         if self.status[index] != 'close':
-            await self.send_message('close' + str(index + 1))
+            await self.send_message('close' + str(index + 1), **kwargs)
             self.status[index] = 'close'
 
     """
@@ -73,11 +74,10 @@ class BaseMul(BaseDevice):
         res: lan_device%28-d9-8a-xx-xx-xx%nopassword%close%rack
     """
 
-    async def turn_on_all(self):
+    async def turn_on_all(self, **kwargs):
         if any(status != 'open' for status in self.status):
-            await self.send_message('openall')
-            for index, _ in enumerate(self.status):
-                self.status[index] = 'open'
+            await self.send_message('openall', **kwargs)
+            self.status = list('open' for _ in self.status)
 
     """
         全部关闭
@@ -85,8 +85,7 @@ class BaseMul(BaseDevice):
         res: lan_device%28-d9-8a-xx-xx-xx%nopassword%close%rack
     """
 
-    async def turn_off_all(self):
+    async def turn_off_all(self, **kwargs):
         if any(status != 'close' for status in self.status):
-            await self.send_message('closeall')
-            for index, _ in enumerate(self.status):
-                self.status[index] = 'close'
+            await self.send_message('closeall', **kwargs)
+            self.status = list('close' for _ in self.status)

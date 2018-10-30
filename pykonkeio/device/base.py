@@ -2,17 +2,16 @@ from .. import manager
 from .. import socket
 from .. import error
 
-PORT = 27431
-
 
 class BaseDevice(object):
 
-    def __init__(self, ip, device_type):
+    def __init__(self, ip, device_type, loop=None):
         self.ip = ip
         self.device_type = device_type
         self.mac = None
         self.password = None
         self.online = False
+        self.loop = loop
 
     async def fetch_info(self):
         try:
@@ -22,7 +21,7 @@ class BaseDevice(object):
         except error.Timeout:
             self.online = False
 
-    async def send_message(self, action, action_type=None, retry=2):
+    async def send_message(self, action, action_type=None, retry=2, loop=None):
         if not self.online:
             await self.fetch_info()
 
@@ -32,7 +31,7 @@ class BaseDevice(object):
         params = (self.ip, self.mac, self.password, action, action_type or self.device_type)
 
         try:
-            data = await socket.send_message(params, retry=retry)
+            data = await socket.send_message(params, retry=retry, loop=loop or self.loop)
             return data[3]
         except error.Timeout:
             self.online = False

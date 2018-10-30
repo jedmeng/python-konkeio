@@ -1,4 +1,5 @@
 import socket
+import math
 import logging
 import asyncio
 from . import error
@@ -11,16 +12,16 @@ _LOGGER = logging.getLogger('socket')
 _is_start = False
 _device_list = []
 _message_handlers = []
-loop = asyncio.get_event_loop()
+_receive_task = None
 
 _sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
 _sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 _sock.setblocking(False)
 
 
-def send(ip, mac, password, param1, param2):
+def send(ip, mac, password, param1, param2, loop=None):
     if not _is_start:
-        start()
+        start(loop=loop)
 
     address = (ip, _PORT)
     cmd = 'lan_phone%%%s%%%s%%%s%%%s' % (mac, password, param1, param2)
@@ -29,7 +30,7 @@ def send(ip, mac, password, param1, param2):
     _LOGGER.debug('send %s %s', ip, cmd)
 
 
-async def _do_receive():
+async def _do_receive(loop=None):
     def message_handler(*args):
         message, (address, _) = _sock.recvfrom(256)
         message = utils.decrypt(message)
@@ -43,16 +44,17 @@ async def _do_receive():
             for callback in _message_handlers:
                 callback(address, *data)
 
+    loop = loop or asyncio.get_event_loop()
     loop.add_reader(_sock.fileno(), message_handler, None)
-    while True:
-        try:
-            await asyncio.sleep(1)
-        except asyncio.CancelledError:
-            loop.remove_reader(_sock.fileno())
-            break
+    try:
+        await asyncio.sleep(math.inf)
+    except asyncio.CancelledError:
+        loop.remove_reader(_sock.fileno())
 
 
-async def receive(mac=None):
+async def receive(mac=None, loop=None):
+    if not _is_start:
+        start(loop=loop)
     future = asyncio.Future(loop=loop)
 
     def message_handler(*data):
@@ -67,21 +69,23 @@ async def receive(mac=None):
         raise error.Timeout('connect timeout')
     finally:
         _message_handlers.remove(message_handler)
+        if len(_message_handlers) == 0:
+            stop()
 
 
-async def send_message(params, retry=2):
+async def send_message(params, retry=2, loop=None):
     if retry <= 0:
         raise error.Timeout('connect timeout')
 
-    send(*params)
+    send(*params, loop=loop)
 
     while True:
         try:
-            data = await receive(params[1])
+            data = await receive(params[1], loop=loop)
         except error.Timeout:
-            return await send_message(params, retry=retry - 1)
+            return await send_message(params, retry=retry - 1, loop=loop)
 
-        if data[4][-4] == params[4][0] and data[4][-3:] == 'ack':
+        if data[4][0] == params[4][0] and data[4][-3:] == 'ack':
             return data
 
 
@@ -93,7 +97,13 @@ def remove_message_handler(handler):
     _message_handlers.remove(handler)
 
 
-def start():
-    global _is_start
+def start(loop=None):
+    global _is_start, _receive_task
     _is_start = True
-    asyncio.ensure_future(_do_receive())
+    _receive_task = asyncio.ensure_future(_do_receive(loop=loop))
+
+
+def stop(loop=None):
+    global _is_start, _receive_task
+    _is_start = False
+    _receive_task and _receive_task.cancel()

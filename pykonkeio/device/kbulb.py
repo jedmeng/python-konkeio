@@ -3,13 +3,13 @@ from .. import utils
 from .. import error
 
 
-class KBlub(BaseToggle):
+class KBulb(BaseToggle):
 
     def __init__(self, ip):
         self.brightness = 0
         self.ct = 0
         self.mode = 0
-        super().__init__(ip, 'kblub')
+        super().__init__(ip, 'kbulb')
 
     async def do(self, action, value=None):
         if action == 'get_brightness':
@@ -33,7 +33,7 @@ class KBlub(BaseToggle):
         try:
             info = (await self.send_message('check')).split('&')
 
-            [self.status, modes] = info.split('#')
+            [self.status, modes] = info[0].split('#')
             [mode1, *_] = modes.split('&')
             [ct, lum, mode] = mode1.split(',')
 

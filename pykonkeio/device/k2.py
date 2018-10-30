@@ -24,19 +24,19 @@ class K2(BaseToggle):
         else:
             return await super().do(action, value)
 
-    async def update(self):
-        await super().update()
-        self.usb_status = await self.send_message('check', 'usb')
-        self.light_status = await self.send_message('check', 'light')
+    async def update(self, **kwargs):
+        await super().update(**kwargs)
+        self.usb_status = await self.send_message('check', 'usb', **kwargs)
+        self.light_status = await self.send_message('check', 'light', **kwargs)
 
     """
         打开USB
         req: lan_phone%28-d9-8a-xx-xx-xx%XXXXXXXX%open%usb
         res: lan_device%28-d9-8a-xx-xx-xx%nopassword%open%uack
     """
-    async def turn_on_usb(self):
+    async def turn_on_usb(self, **kwargs):
         if self.usb_status != 'open':
-            await self.send_message('open', 'usb')
+            await self.send_message('open', 'usb', **kwargs)
             self.usb_status = 'open'
 
     """
@@ -44,9 +44,9 @@ class K2(BaseToggle):
         req: lan_phone%28-d9-8a-xx-xx-xx%XXXXXXXX%open%usb
         res: lan_device%28-d9-8a-xx-xx-xx%nopassword%close%uack
     """
-    async def turn_off_usb(self):
+    async def turn_off_usb(self, **kwargs):
         if self.usb_status != 'close':
-            await self.send_message('close', 'usb')
+            await self.send_message('close', 'usb', **kwargs)
             self.usb_status = 'close'
 
     """
@@ -54,9 +54,9 @@ class K2(BaseToggle):
         req: lan_phone%28-d9-8a-xx-xx-xx%XXXXXXXX%open%light
         res: lan_device%28-d9-8a-xx-xx-xx%nopassword%open%lack
     """
-    async def turn_on_light(self):
+    async def turn_on_light(self, **kwargs):
         if self.light_status != 'open':
-            await self.send_message('open', 'light')
+            await self.send_message('open', 'light', **kwargs)
             self.light_status = 'open'
 
     """
@@ -64,9 +64,9 @@ class K2(BaseToggle):
         req: lan_phone%28-d9-8a-xx-xx-xx%XXXXXXXX%open%light
         res: lan_device%28-d9-8a-xx-xx-xx%nopassword%close%lack
     """
-    async def turn_off_light(self):
+    async def turn_off_light(self, **kwargs):
         if self.light_status != 'close':
-            await self.send_message('close', 'light')
+            await self.send_message('close', 'light', **kwargs)
             self.light_status = 'close'
 
     """
@@ -74,8 +74,8 @@ class K2(BaseToggle):
         req: lan_phone%28-d9-8a-xx-xx-xx%XXXXXXXX%check%power
         res: lan_device%28-d9-8a-xx-xx-xx%nopassword%close%pack
     """
-    async def get_power(self):
-        res = await self.send_message('check', 'power')
+    async def get_power(self, **kwargs):
+        res = await self.send_message('check', 'power', **kwargs)
 
         _, _, power = res.split('#')
         return power

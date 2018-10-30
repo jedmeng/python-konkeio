@@ -11,18 +11,18 @@ _devices = {}
 _device_info = {}
 
 
-async def search(ip='255.255.255.255', callback=None):
+async def search(ip='255.255.255.255', callback=None, loop=None):
     datetime = time.strftime("%Y-%m-%d %H:%M:%S", time.localtime())
     socket.send(ip, 'mac', 'nopassword', datetime, 'heart')
 
-    future = asyncio.Future(loop=socket.loop)
+    future = asyncio.Future(loop=loop)
 
     def message_handler(*data):
         if data[4] != 'hack':
             return
         if callback is not None:
             callback(*data)
-        if ip == data[0]:
+        if ip == data[0] and not future.done():
             future.set_result(data)
             _device_info[data[0]] = data
 
@@ -52,12 +52,20 @@ def get_device(ip, device_type=None):
     elif device_type == 'klight':
         device = KLight(ip)
     elif device_type == 'kbulb':
-        device = KBlub(ip)
+        device = KBulb(ip)
     else:
         raise error.IllegalDevice('device %s not support' % device_type)
 
     _devices[ip] = device
     return device
+
+
+def clear_device_info(ip=None):
+    global _device_info
+    if ip:
+        del _device_info[ip]
+    else:
+        _device_info = {}
 
 
 async def get_device_info(ip):
