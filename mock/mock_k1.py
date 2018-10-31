@@ -6,6 +6,12 @@ class MockK1(MockBaseDevice):
         super().__init__(online=online)
         self.status = init_status
 
+    def send_message(self, src, action=None, action_type=None, **kwargs):
+        mac = self.mac
+        if action_type == 'hack':
+            mac = mac.replace('-', ':')
+        super().send_message(src, action, action_type, mac=mac, **kwargs)
+
     def message_handler(self, src, action, device_type):
         if action == 'check' and device_type == 'relay':
             self.send_message(src, self.status, 'rack')

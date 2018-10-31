@@ -13,21 +13,30 @@ class MockBaseDevice(object):
         self.password = password or ''.join(map(lambda x: random.choice(string.ascii_uppercase), range(8)))
         self.online = online
         self.socket = Socket(self._message_handler)
+        self._send_flag = False
         _LOGGER.debug('mock server: %s %s %s', self.__class__.__name__, self.mac, self.password)
 
     def set_is_online(self, is_online):
         self.online = is_online
 
-    def send_message(self, src, action, action_type, password='nopassword'):
-        self.socket.send(src, self.mac, password, action, action_type)
+    def send_message(self, src, action=None, action_type=None, mac=None, password='nopassword', **kwargs):
+        self._send_flag = True
+        self.socket.send(src, mac=mac or self.mac, password=password, action=action, action_type=action_type, **kwargs)
 
-    def _message_handler(self, src, mac, _, action, action_type):
+    def _message_handler(self, src, mac, password, action, action_type):
+        self._send_flag = False
         if not self.online:
             return
         elif action_type == 'heart':
             self.send_message(src, password=self.password, action='#', action_type='hack')
         elif mac == self.mac:
             self.message_handler(src, action, action_type)
+
+        if not self._send_flag:
+            self.error_message_handler(src, mac, password, action, action_type)
+
+    def error_message_handler(self, src, mac, password, action, action_type):
+        self.send_message(src)
 
     def message_handler(self, src, action, device_type):
         pass

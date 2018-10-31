@@ -14,11 +14,13 @@ class Socket(object):
         self._callback = callback
         self._task = None
 
-    def send(self, address, mac, password, param1, param2):
-        cmd = 'lan_device%%%s%%%s%%%s%%%s' % (mac, password, param1, param2)
+    def send(self, address, mac, password, action, action_type, msg_type='lan_device'):
+        cmd = '%s%%%s%%%s%%%s%%%s' % (msg_type, mac, password, action, action_type)
+        if not action or not action:
+            cmd = ''
         message = utils.encrypt(cmd)
         self._sock.sendto(message, address)
-        _LOGGER.debug('send %s %s', address[0], cmd)
+        _LOGGER.debug('send %s %s', address[0], cmd or '(empty)')
 
     async def _do_receive(self, loop=None):
         def message_handler(*_):
