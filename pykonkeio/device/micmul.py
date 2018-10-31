@@ -8,4 +8,3 @@ class MicMul(BaseMul):
     @property
     def socket_count(self):
         return SOCKET_COUNT
-

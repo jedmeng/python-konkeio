@@ -1,6 +1,6 @@
 import pytest
 import random
-from ..mock.mock_micmul import MockMicMul
+from mock.mock_micmul import MockMicMul
 from pykonkeio.device.micmul import MicMul
 from pykonkeio import manager as client_manager
 

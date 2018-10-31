@@ -21,7 +21,7 @@ class Socket(object):
         _LOGGER.debug('send %s %s', address[0], cmd)
 
     async def _do_receive(self, loop=None):
-        def message_handler(*args):
+        def message_handler(*_):
             message, address = self._sock.recvfrom(256)
             message = utils.decrypt(message)
             _LOGGER.debug('receive %s %s %s', *address, message or '(empty)')
@@ -44,7 +44,3 @@ class Socket(object):
     def close(self):
         self._task.cancel()
         self._sock.close()
-
-
-
-

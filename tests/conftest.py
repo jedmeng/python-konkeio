@@ -1,5 +1,4 @@
 import pytest
-import re
 
 
 def pytest_addoption(parser):
@@ -12,6 +11,7 @@ def device_address(request):
     if request.config.getoption("--device"):
         return request.config.getoption("--ip")
 
+
 def pytest_collection_modifyitems(config, items):
     device = config.getoption("--device") 
     if not device or not config.getoption("--ip"):
@@ -21,5 +21,3 @@ def pytest_collection_modifyitems(config, items):
     for item in items:
         if item.parent.name[5:-3] != device:
             item.add_marker(skip)
-
-

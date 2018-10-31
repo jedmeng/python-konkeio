@@ -26,7 +26,8 @@ class KLight(BaseToggle):
     """
         获取状态
         req: lan_phone%28-d9-8a-xx-xx-xx%XXXXXXXX%check%klight
-        res: lan_device%28-d9-8a-xx-xx-xx%nopassword%open#x#x#x#x#1,x#1&#x#x#x#x#2,x#1&#x#x#x#x#3,x#1&#x#x#x#x#5,x#1%klack
+        res: lan_device%28-d9-8a-xx-xx-xx%nopassword%open#x#x#x#x#1,x#1&#x#x#x#x#2,x#1&#x#x#x#x#3,x#1&#x#x#x#x#5,x#1
+             %klack
     """
     async def update(self, **kwargs):
         if not self.online:
@@ -61,7 +62,7 @@ class KLight(BaseToggle):
 
     """
         调整颜色
-        req: lan_phone%28-d9-8a-xx-xx-xx%XXXXXXXX%open%light
+        req: lan_phone%28-d9-8a-xx-xx-xx%XXXXXXXX%open%klight
     """
     async def set_color(self, r=None, g=None, b=None, **kwargs):
         try:

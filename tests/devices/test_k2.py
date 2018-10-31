@@ -1,6 +1,6 @@
 import pytest
 import re
-from ..mock.mock_k2 import MockK2
+from mock.mock_k2 import MockK2
 from pykonkeio.device.k2 import K2
 from pykonkeio import manager as client_manager
 

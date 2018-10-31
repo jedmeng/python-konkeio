@@ -11,7 +11,7 @@ usage: konkeio [action] [device] [address] [value] [--verbose]
 
 Supported devices and actions supported by each device:
 global: search help
-k2:     get_status turn_[on/off] turn_[on/off]_usb turn_[on/off]_light
+k2:     get_status turn_[on/off] get_usb_status turn_[on/off]_usb get_light_status turn_[on/off]_light get_power
 minik:  get_status turn_[on/off]
 micmul: get_count get_status_all get_status[1/2/3/4] turn_[on/off]_all turn_[on/off]_socket[1/2/3/4]
 mul:    get_count get_status_all get_status[1/2/3] get_usb_count get_usb_status_all get_usb_status[1/2] 
@@ -43,7 +43,7 @@ konkeio turn_off bulb 192.168.0.64
 '''
 
 
-def print_device(ip, mac, password, *args):
+def print_device(ip, mac, password, *_):
     print('ip: %s\nmac: %s\npassword: %s\n\n' % (ip, mac, password))
 
 

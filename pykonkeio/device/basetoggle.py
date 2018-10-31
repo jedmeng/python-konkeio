@@ -1,5 +1,4 @@
 from .base import BaseDevice
-from .. import error
 
 
 class BaseToggle(BaseDevice):

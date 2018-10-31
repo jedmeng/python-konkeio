@@ -1,5 +1,5 @@
 import pytest
-from ..mock.mock_minik import MockMiniK
+from mock.mock_minik import MockMiniK
 from pykonkeio.device.minik import MiniK
 from pykonkeio import manager as client_manager
 

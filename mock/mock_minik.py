@@ -1,7 +1,7 @@
 from .mock_base_device import MockBaseDevice
 
 
-class MockK1(MockBaseDevice):
+class MockMiniK(MockBaseDevice):
     def __init__(self, init_status='close', online=True):
         super().__init__(online=online)
         self.status = init_status
@@ -12,4 +12,3 @@ class MockK1(MockBaseDevice):
         elif action in ['open', 'close'] and device_type == 'relay':
             self.status = action
             self.send_message(src, self.status, 'rack')
-

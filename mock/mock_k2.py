@@ -30,4 +30,3 @@ class MockK2(MockBaseDevice):
             self.last_power = random.randint(0, 3000) / 100
             power = 'dl_module#power#%.2f' % self.last_power
             self.send_message(src, power, 'pack')
-

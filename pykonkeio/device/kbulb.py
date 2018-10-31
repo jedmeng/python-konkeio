@@ -27,7 +27,8 @@ class KBulb(BaseToggle):
     """
         获取状态
         req: lan_phone%28-d9-8a-xx-xx-xx%XXXXXXXX%check%kbulb
-        res: lan_device%28-d9-8a-xx-xx-xx%nopassword%open#x#x#x#x#1,x#1&#x#x#x#x#2,x#1&#x#x#x#x#3,x#1&#x#x#x#x#5,x#1%kbulb
+        res: lan_device%28-d9-8a-xx-xx-xx%nopassword%open#x#x#x#x#1,x#1&#x#x#x#x#2,x#1&#x#x#x#x#3,x#1&#x#x#x#x#5,x#1
+             %kbulb
     """
     async def update(self):
         try:

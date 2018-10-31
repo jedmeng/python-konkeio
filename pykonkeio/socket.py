@@ -31,7 +31,7 @@ def send(ip, mac, password, param1, param2, loop=None):
 
 
 async def _do_receive(loop=None):
-    def message_handler(*args):
+    def message_handler(*_):
         message, (address, _) = _sock.recvfrom(256)
         message = utils.decrypt(message)
         _LOGGER.debug('receive %s %s', address, message or '(empty)')
@@ -103,7 +103,7 @@ def start(loop=None):
     _receive_task = asyncio.ensure_future(_do_receive(loop=loop))
 
 
-def stop(loop=None):
+def stop():
     global _is_start, _receive_task
     _is_start = False
     _receive_task and _receive_task.cancel()

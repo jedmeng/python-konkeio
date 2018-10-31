@@ -21,7 +21,7 @@ class MockBaseDevice(object):
     def send_message(self, src, action, action_type, password='nopassword'):
         self.socket.send(src, self.mac, password, action, action_type)
 
-    def _message_handler(self, src, mac, password, action, action_type):
+    def _message_handler(self, src, mac, _, action, action_type):
         if not self.online:
             return
         elif action_type == 'heart':

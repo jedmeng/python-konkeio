@@ -22,4 +22,3 @@ class MockKBulb(MockBaseDevice):
             elif name == 'ctp':
                 self.ct = value
             self.send_message(src, 'x', 'kback')
-
