@@ -91,6 +91,5 @@ async def test_update(server: MockMicMul, client: MicMul):
     assert client.status == server.status
 
     server.status = list(random.choice(('open', 'close')) for _ in client.status)
-    print(server.status)
     await client.update()
     assert client.status == server.status

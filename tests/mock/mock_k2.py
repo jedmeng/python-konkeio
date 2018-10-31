@@ -11,7 +11,6 @@ class MockK2(MockBaseDevice):
         self.last_power = 0
 
     def message_handler(self, src, action, device_type):
-        print('action %s device_type %s', action, device_type)
         if action == 'check' and device_type == 'relay':
             self.send_message(src, self.status, 'rack')
         elif action in ['open', 'close'] and device_type == 'relay':

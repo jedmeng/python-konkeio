@@ -36,5 +36,4 @@ class MockBaseDevice(object):
         self.socket.open(loop=loop)
 
     def stop(self):
-        print("\n\nmock stop\n\n")
         self.socket.close()
