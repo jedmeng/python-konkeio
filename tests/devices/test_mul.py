@@ -100,30 +100,67 @@ async def test_turn_off_usb(server: MockMul, client: Mul):
 # noinspection 801,PyShadowingNames
 @pytest.mark.asyncio
 async def test_update(server: MockMul, client: Mul):
-    if not server:
-        return
+    if server:
+        server.start()
+        server.status = list(['close'] * client.socket_count)
+        server.usb_status = list(['close'] * client.usb_count)
+        await client.update()
+        assert client.status == server.status
+        assert client.usb_status == server.usb_status
 
-    server.start()
-    server.status = list(['close'] * client.socket_count)
-    server.usb_status = list(['close'] * client.usb_count)
-    await client.update()
-    assert client.status == server.status
-    assert client.usb_status == server.usb_status
+        server.status = list(['open'] * client.socket_count)
+        server.usb_status = list(['open'] * client.usb_count)
+        await client.update()
+        assert client.status == server.status
+        assert client.usb_status == server.usb_status
 
-    server.status = list(['open'] * client.socket_count)
-    server.usb_status = list(['open'] * client.usb_count)
-    await client.update()
-    assert client.status == server.status
-    assert client.usb_status == server.usb_status
+        server.status = list(random.choice(('open', 'close')) for _ in client.status)
+        server.usb_status = list(random.choice(('open', 'close')) for _ in client.usb_status)
+        await client.update()
+        assert client.status == server.status
+        assert client.usb_status == server.usb_status
 
-    server.status = list(['close'] * client.socket_count)
-    server.usb_status = list(['close'] * client.usb_count)
-    await client.update()
-    assert client.status == server.status
-    assert client.usb_status == server.usb_status
+        server.status = list(['close'] * client.socket_count)
+        server.usb_status = list(['close'] * client.usb_count)
+        await client.update()
+        assert client.status == server.status
+        assert client.usb_status == server.usb_status
 
-    server.status = list(random.choice(('open', 'close')) for _ in client.status)
-    server.usb_status = list(random.choice(('open', 'close')) for _ in client.usb_status)
-    await client.update()
-    assert client.status == server.status
-    assert client.usb_status == server.usb_status
+    else:
+        await client.turn_off_all()
+        for i in client.usb_status:
+            await client.turn_off_usb(i)
+        await client.update()
+        assert client.status == 'close'
+        assert client.usb_status == 'close'
+
+        await client.turn_on_all()
+        for i in client.usb_status:
+            await client.turn_on_usb(i)
+        await client.update()
+        assert client.status == 'open'
+        assert client.usb_status == 'open'
+
+        status = ['open'] * client.socket_count
+        usb_status = ['open'] * client.usb_count
+        for i in client.status:
+            if random.choice((True, False)):
+                await client.turn_off(i)
+                status[i] = 'close'
+        for i in client.usb_status:
+            if random.choice((True, False)):
+                await client.turn_off_usb(i)
+                usb_status[i] = 'close'
+        await client.update()
+        assert client.status == status
+        assert client.usb_status == usb_status
+
+        await client.turn_off_all()
+        for i in client.usb_status:
+            await client.turn_off_usb(i)
+        await client.update()
+        assert client.status == 'close'
+        assert client.usb_status == 'close'
+
+
+

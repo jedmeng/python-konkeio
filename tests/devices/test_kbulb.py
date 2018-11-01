@@ -76,28 +76,50 @@ async def test_set_ct(server: MockKBulb, client: KBulb):
 # noinspection 801,PyShadowingNames
 @pytest.mark.asyncio
 async def test_update(server: MockKBulb, client: KBulb):
-    if not server:
-        return
+    if server:
+        server.start()
+        server.status = 'close'
+        await client.update()
+        assert client.status == server.status
 
-    server.start()
-    server.status = 'close'
-    await client.update()
-    assert client.status == server.status
+        server.status = 'open'
+        server.ct = 2700
+        server.brightness = 10
+        await client.update()
+        assert client.status == server.status
+        assert client.ct == server.ct
+        assert client.brightness == server.brightness
 
-    server.status = 'open'
-    server.ct = 2700
-    server.brightness = 10
-    await client.update()
-    assert client.status == server.status
-    assert client.ct == server.ct
-    assert client.brightness == server.brightness
+        server.ct = 6500
+        server.brightness = 100
+        await client.update()
+        assert client.ct == server.ct
+        assert client.brightness == server.brightness
 
-    server.ct = 6500
-    server.brightness = 100
-    await client.update()
-    assert client.ct == server.ct
-    assert client.brightness == server.brightness
+        server.status = 'close'
+        await client.update()
+        assert client.status == server.status
 
-    server.status = 'close'
-    await client.update()
-    assert client.status == server.status
+    else:
+        await client.turn_off()
+        await client.update()
+        assert client.status == 'close'
+
+        await client.turn_on()
+        await client.set_brightness(10)
+        await client.set_ct(2700)
+        await client.update()
+        assert client.status == 'open'
+        assert client.ct == 10
+        assert client.brightness == 2700
+
+        await client.set_brightness(100)
+        await client.set_ct(6500)
+        await client.update()
+        assert client.status == 'open'
+        assert client.ct == 100
+        assert client.brightness == 6500
+
+        await client.turn_off()
+        await client.update()
+        assert client.status == 'close'

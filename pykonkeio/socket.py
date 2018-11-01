@@ -19,12 +19,12 @@ _sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 _sock.setblocking(False)
 
 
-def send(ip, mac, password, param1, param2, loop=None):
+def send(ip, mac, password, action, action_type, device_type='lan_phone', loop=None):
     if not _is_start:
         start(loop=loop)
 
     address = (ip, _PORT)
-    cmd = 'lan_phone%%%s%%%s%%%s%%%s' % (mac, password, param1, param2)
+    cmd = '%s%%%s%%%s%%%s%%%s' % (device_type, mac, password, action, action_type)
     message = utils.encrypt(cmd)
     _sock.sendto(message, address)
     _LOGGER.debug('send %s %s', ip, cmd)

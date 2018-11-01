@@ -45,18 +45,29 @@ async def test_turn_off(server: MockMiniK, client: MiniK):
 # noinspection 801,PyShadowingNames
 @pytest.mark.asyncio
 async def test_update(server: MockMiniK, client: MiniK):
-    if not server:
-        return
+    if server:
+        server.start()
+        server.status = 'close'
+        await client.update()
+        assert client.status == server.status
 
-    server.start()
-    server.status = 'close'
-    await client.update()
-    assert client.status == server.status
+        server.status = 'open'
+        await client.update()
+        assert client.status == server.status
 
-    server.status = 'open'
-    await client.update()
-    assert client.status == server.status
+        server.status = 'close'
+        await client.update()
+        assert client.status == server.status
 
-    server.status = 'close'
-    await client.update()
-    assert client.status == server.status
+    else:
+        await client.turn_off()
+        await client.update()
+        assert client.status == 'close'
+
+        await client.turn_on()
+        await client.update()
+        assert client.status == 'open'
+
+        await client.turn_off()
+        await client.update()
+        assert client.status == 'close'

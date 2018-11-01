@@ -76,28 +76,50 @@ async def test_set_color(server: MockKLight, client: KLight):
 # noinspection 801,PyShadowingNames
 @pytest.mark.asyncio
 async def test_update(server: MockKLight, client: KLight):
-    if not server:
-        return
+    if server:
+        server.start()
+        server.status = 'close'
+        await client.update()
+        assert client.status == server.status
 
-    server.start()
-    server.status = 'close'
-    await client.update()
-    assert client.status == server.status
+        server.status = 'open'
+        server.color = [100, 100, 100]
+        server.brightness = 10
+        await client.update()
+        assert client.status == server.status
+        assert client.color == server.color
+        assert client.brightness == server.brightness
 
-    server.status = 'open'
-    server.color = [100, 100, 100]
-    server.brightness = 10
-    await client.update()
-    assert client.status == server.status
-    assert client.color == server.color
-    assert client.brightness == server.brightness
+        server.color = [255, 255, 255]
+        server.brightness = 100
+        await client.update()
+        assert client.color == server.color
+        assert client.brightness == server.brightness
 
-    server.color = [255, 255, 255]
-    server.brightness = 100
-    await client.update()
-    assert client.color == server.color
-    assert client.brightness == server.brightness
+        server.status = 'close'
+        await client.update()
+        assert client.status == server.status
 
-    server.status = 'close'
-    await client.update()
-    assert client.status == server.status
+    else:
+        await client.turn_off()
+        await client.update()
+        assert client.status == 'close'
+
+        await client.turn_on()
+        await client.set_brightness(10)
+        await client.set_color(100, 100, 100)
+        await client.update()
+        assert client.status == 'open'
+        assert client.color == [100, 100, 100]
+        assert client.brightness == 2700
+
+        await client.set_brightness(100)
+        await client.set_color(255, 255, 255)
+        await client.update()
+        assert client.status == 'open'
+        assert client.color == [255, 255, 255]
+        assert client.brightness == 6500
+
+        await client.turn_off()
+        await client.update()
+        assert client.status == 'close'

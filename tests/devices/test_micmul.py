@@ -74,22 +74,41 @@ async def test_turn_off_all(server: MockMicMul, client: MicMul):
 # noinspection 801,PyShadowingNames
 @pytest.mark.asyncio
 async def test_update(server: MockMicMul, client: MicMul):
-    if not server:
-        return
+    if server:
+        server.start()
+        server.status = list(['close'] * client.socket_count)
+        await client.update()
+        assert client.status == server.status
 
-    server.start()
-    server.status = list(['close'] * client.socket_count)
-    await client.update()
-    assert client.status == server.status
+        server.status = list(['open'] * client.socket_count)
+        await client.update()
+        assert client.status == server.status
 
-    server.status = list(['open'] * client.socket_count)
-    await client.update()
-    assert client.status == server.status
+        server.status = list(['close'] * client.socket_count)
+        await client.update()
+        assert client.status == server.status
 
-    server.status = list(['close'] * client.socket_count)
-    await client.update()
-    assert client.status == server.status
+        server.status = list(random.choice(('open', 'close')) for _ in client.status)
+        await client.update()
+        assert client.status == server.status
 
-    server.status = list(random.choice(('open', 'close')) for _ in client.status)
-    await client.update()
-    assert client.status == server.status
+    else:
+        await client.turn_off_all()
+        await client.update()
+        assert client.status == 'close'
+
+        await client.turn_on_all()
+        await client.update()
+        assert client.status == 'open'
+
+        status = ['open'] * client.socket_count
+        for i in client.status:
+            if random.choice((True, False)):
+                await client.turn_off(i)
+                status[i] = 'close'
+        await client.update()
+        assert client.status == status
+
+        await client.turn_off_all()
+        await client.update()
+        assert client.status == 'close'

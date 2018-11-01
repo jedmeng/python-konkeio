@@ -5,7 +5,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='pykonkeio',
-    version='2.0.1b0',
+    version='2.0.1b2',
     keywords=['konke', 'iot'],
     description='Python library for interfacing with konke smart appliances',
     long_description=open('README.md', 'rt').read(),

@@ -107,30 +107,53 @@ async def test_check_power(server: MockK2, client: K2):
 # noinspection 801,PyShadowingNames
 @pytest.mark.asyncio
 async def test_update(server: MockK2, client: K2):
-    if not server:
-        return
+    if server:
+        server.start()
+        server.status = 'close'
+        server.usb_status = 'close'
+        server.light_status = 'close'
+        await client.update()
+        assert client.status == server.status
+        assert client.usb_status == server.usb_status
+        assert client.light_status == server.light_status
 
-    server.start()
-    server.status = 'close'
-    server.usb_status = 'close'
-    server.light_status = 'close'
-    await client.update()
-    assert client.status == server.status
-    assert client.usb_status == server.usb_status
-    assert client.light_status == server.light_status
+        server.status = 'open'
+        server.usb_status = 'open'
+        server.light_status = 'open'
+        await client.update()
+        assert client.status == server.status
+        assert client.usb_status == server.usb_status
+        assert client.light_status == server.light_status
 
-    server.status = 'open'
-    server.usb_status = 'open'
-    server.light_status = 'open'
-    await client.update()
-    assert client.status == server.status
-    assert client.usb_status == server.usb_status
-    assert client.light_status == server.light_status
+        server.status = 'close'
+        server.usb_status = 'close'
+        server.light_status = 'close'
+        await client.update()
+        assert client.status == server.status
+        assert client.usb_status == server.usb_status
+        assert client.light_status == server.light_status
 
-    server.status = 'close'
-    server.usb_status = 'close'
-    server.light_status = 'close'
-    await client.update()
-    assert client.status == server.status
-    assert client.usb_status == server.usb_status
-    assert client.light_status == server.light_status
+    else:
+        await client.turn_off()
+        await client.turn_off_usb()
+        await client.turn_off_light()
+        await client.update()
+        assert client.status == 'close'
+        assert client.usb_status == 'close'
+        assert client.light_status == 'close'
+
+        await client.turn_on()
+        await client.turn_on_usb()
+        await client.turn_on_light()
+        await client.update()
+        assert client.status == 'open'
+        assert client.usb_status == 'open'
+        assert client.light_status == 'open'
+
+        await client.turn_off()
+        await client.turn_off_usb()
+        await client.turn_off_light()
+        await client.update()
+        assert client.status == 'close'
+        assert client.usb_status == 'close'
+        assert client.light_status == 'close'
