@@ -110,15 +110,15 @@ async def test_update(server: MockKBulb, client: KBulb):
         await client.set_ct(2700)
         await client.update()
         assert client.status == 'open'
-        assert client.ct == 10
-        assert client.brightness == 2700
+        assert client.ct == 2700
+        assert client.brightness == 10
 
         await client.set_brightness(100)
         await client.set_ct(6500)
         await client.update()
         assert client.status == 'open'
-        assert client.ct == 100
-        assert client.brightness == 6500
+        assert client.ct == 6500
+        assert client.brightness == 100
 
         await client.turn_off()
         await client.update()

@@ -21,4 +21,5 @@ class MockKBulb(MockBaseDevice):
                 self.brightness = value
             elif name == 'ctp':
                 self.ct = value
-            self.send_message(src, 'x', 'kback')
+            self.send_message(src, action, 'kback')
+            self.status = 'open'

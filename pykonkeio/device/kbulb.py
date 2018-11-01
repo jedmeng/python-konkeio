@@ -27,8 +27,7 @@ class KBulb(BaseToggle):
     """
         获取状态
         req: lan_phone%28-d9-8a-xx-xx-xx%XXXXXXXX%check%kbulb
-        res: lan_device%28-d9-8a-xx-xx-xx%nopassword%open#x#x#x#x#1,x#1&#x#x#x#x#2,x#1&#x#x#x#x#3,x#1&#x#x#x#x#5,x#1
-             %kbulb
+        res: lan_device%28-d9-8a-xx-xx-xx%nopassword%open#2700,100,0&5161,50,6%kback
     """
     async def update(self):
         try:
@@ -47,6 +46,7 @@ class KBulb(BaseToggle):
     """
         调整亮度
         req: lan_phone%28-d9-8a-xx-xx-xx%XXXXXXXX%%set#lum#xxx%kbulb
+        res: lan_device%28-d9-8a-xx-xx-xx%XXXXXXXX%%set#lum#xxx%kback
     """
     async def set_brightness(self, w):
         try:
@@ -58,10 +58,12 @@ class KBulb(BaseToggle):
             await self.set_mode(1)
             await self.send_message('set#lum#%s' % w)
             self.brightness = int(w)
+            self.status = 'open'
 
     """
         调整色温
         req: lan_phone%28-d9-8a-xx-xx-xx%XXXXXXXX%%set#ctp#xxx%kbulb
+        res: lan_device%28-d9-8a-xx-xx-xx%XXXXXXXX%%set#ctp#xxx%kback
     """
     async def set_ct(self, ct):
         try:
@@ -73,10 +75,15 @@ class KBulb(BaseToggle):
             await self.set_mode(1)
             await self.send_message('set#ctp#%s' % ct)
             self.ct = int(ct)
+            self.status = 'open'
+
+            if ct == 0:
+                await self.turn_off()
 
     """
         调整模式
         req: lan_phone%28-d9-8a-xx-xx-xx%XXXXXXXX%%set#mode#x%kbulb
+        res: lan_device%28-d9-8a-xx-xx-xx%XXXXXXXX%%set#mode#x%kback
     """
     async def set_mode(self, mode):
         if self.mode != int(mode):
