@@ -14,7 +14,12 @@ class MockBaseDevice(object):
         self.online = online
         self.socket = Socket(self._message_handler)
         self._send_flag = False
+        self.status = '#'
         _LOGGER.debug('mock server: %s %s %s', self.__class__.__name__, self.mac, self.password)
+
+    @property
+    def heart_response(self):
+        return self.status
 
     def set_is_online(self, is_online):
         self.online = is_online
@@ -28,7 +33,7 @@ class MockBaseDevice(object):
         if not self.online:
             return
         elif action_type == 'heart':
-            self.send_message(src, password=self.password, action='#', action_type='hack')
+            self.send_message(src, password=self.password, action=self.heart_response, action_type='hack')
         elif mac == self.mac:
             self.message_handler(src, action, action_type)
 

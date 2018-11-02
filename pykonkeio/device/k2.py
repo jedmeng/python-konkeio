@@ -1,12 +1,29 @@
 from .basetoggle import BaseToggle
+from ..mixin.ir import IRMixin
+from ..mixin.rf import RFMixin
 
 
-class K2(BaseToggle):
+class K2(BaseToggle, IRMixin, RFMixin):
 
     def __init__(self, ip):
+        super().__init__(ip, 'relay')
         self.light_status = 'close'
         self.usb_status = 'close'
-        super().__init__(ip, 'relay')
+        self.rf_module = False
+        self.ir_module = False
+
+    @property
+    def is_support_rf(self):
+        return self.rf_module
+
+    @property
+    def is_support_ir(self):
+        return self.ir_module
+
+    async def fetch_info(self):
+        status = await super().fetch_info()
+        self.ir_module = status.find('#ir_module#on') > 0
+        self.rf_module = status.find('#rf_module#on') > 0
 
     async def do(self, action, value=None):
         if action == 'get_usb_status':
@@ -23,6 +40,10 @@ class K2(BaseToggle):
             await self.turn_on_light()
         elif action == 'turn_off_light':
             await self.turn_off_light()
+        elif self.is_support_ir and self.is_ir_action(action):
+            return await self.ir_do(action, value)
+        elif self.is_support_rf and self.is_rf_action(action):
+            await self.rf_do(action, value)
         else:
             return await super().do(action, value)
 
@@ -40,6 +61,7 @@ class K2(BaseToggle):
         if self.usb_status != 'open':
             await self.send_message('open', 'usb', **kwargs)
             self.usb_status = 'open'
+            await self.fetch_info()
 
     """
         关闭USB
@@ -50,6 +72,8 @@ class K2(BaseToggle):
         if self.usb_status != 'close':
             await self.send_message('close', 'usb', **kwargs)
             self.usb_status = 'close'
+            self.rf_module = False
+            self.ir_module = False
 
     """
         打开夜灯

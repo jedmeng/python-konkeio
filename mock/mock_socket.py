@@ -44,5 +44,5 @@ class Socket(object):
         self._task = asyncio.ensure_future(self._do_receive(loop=loop))
 
     def close(self):
-        self._task.cancel()
-        self._sock.close()
+        self._task and self._task.cancel()
+        self._sock and self._sock.close()

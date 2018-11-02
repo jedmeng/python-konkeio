@@ -30,7 +30,7 @@ class KLight(BaseToggle):
              %klack
     """
     async def update(self, **kwargs):
-        if not self.online:
+        if not self.is_online:
             super().update(**kwargs)
         try:
             m1, m2, *_ = (await self.send_message('check', **kwargs)).split('&')

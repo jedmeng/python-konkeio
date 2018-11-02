@@ -12,7 +12,7 @@ usage: konkeio [action] [device] [address] [value] [--verbose]
 Supported devices and actions supported by each device:
 global: search help
 k2:     get_status turn_[on/off] get_usb_status turn_[on/off]_usb get_light_status turn_[on/off]_light get_power
-minik:  get_status turn_[on/off]
+minik:  get_status turn_[on/off] learn_ir emit_ir remove_ir
 micmul: get_count get_status_all get_status[1/2/3/4] turn_[on/off]_all turn_[on/off]_socket[1/2/3/4]
 mul:    get_count get_status_all get_status[1/2/3] get_usb_count get_usb_status_all get_usb_status[1/2] 
         turn_[on/off]_all turn_[on/off]_socket[1/2/3] turn_[on/off]_usb[1/2] 
@@ -100,6 +100,11 @@ if __name__ == "__main__":
     logging.basicConfig(level=logging.WARN,
                         datefmt='%Y/%m/%d %H:%M:%S',
                         format='%(asctime)s %(levelname)s %(message)s')
+
     loop = asyncio.get_event_loop()
-    loop.run_until_complete(main())
-    loop.close()
+    try:
+        loop.run_until_complete(main())
+    except KeyboardInterrupt:
+        pass
+    loop.stop()
+
