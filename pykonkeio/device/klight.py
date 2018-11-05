@@ -5,11 +5,11 @@ from .. import error
 
 class KLight(BaseToggle):
 
-    def __init__(self, ip):
+    def __init__(self, ip, **kwargs):
+        super().__init__(ip, 'klight', **kwargs)
         self.color = [0, 0, 0]
         self.brightness = 0
         self.m = 0
-        super().__init__(ip, 'klight')
 
     async def do(self, action, value=None):
         if action == 'get_brightness':

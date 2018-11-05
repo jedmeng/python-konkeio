@@ -21,7 +21,7 @@ class BaseDevice(object):
         except error.Timeout:
             self.is_online = False
 
-    async def send_message(self, action, action_type=None, retry=2, loop=None):
+    async def send_message(self, action, action_type=None, **kwargs):
         if not self.is_online:
             await self.fetch_info()
 
@@ -31,7 +31,7 @@ class BaseDevice(object):
         params = (self.ip, self.mac, self.password, action, action_type or self.device_type)
 
         try:
-            data = await socket.send_message(params, retry=retry, loop=loop or self.loop)
+            data = await socket.send_message(params, **kwargs)
             return data[3]
         except error.Timeout:
             self.is_online = False

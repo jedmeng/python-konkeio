@@ -5,11 +5,11 @@ from .. import error
 
 class KBulb(BaseToggle):
 
-    def __init__(self, ip):
+    def __init__(self, ip, **kwargs):
+        super().__init__(ip, 'kbulb', **kwargs)
         self.brightness = 0
         self.ct = 0
         self.mode = 0
-        super().__init__(ip, 'kbulb')
 
     async def do(self, action, value=None):
         if action == 'get_brightness':

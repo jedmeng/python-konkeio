@@ -6,7 +6,7 @@ from . import error
 from . import socket
 from .device import *
 
-_LOGGER = logging.getLogger('manager')
+_LOGGER = logging.getLogger(__name__)
 _devices = {}
 _device_info = {}
 

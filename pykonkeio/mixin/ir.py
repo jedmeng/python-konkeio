@@ -1,19 +1,17 @@
 import time
 import asyncio
 from .. import error
-from abc import abstractmethod, ABCMeta
 
 DEFAULT_GROUP = 'pykonkeio'
 
 
-class IRMixin(metaclass=ABCMeta):
+class IRMixin:
     def __init__(self):
         self.ir_learning = False
 
     @property
-    @abstractmethod
     def is_support_ir(self):
-        return False
+        raise NotImplementedError()
 
     @staticmethod
     def is_ir_action(action):
@@ -41,7 +39,7 @@ class IRMixin(metaclass=ABCMeta):
         res(成功): lan_phone%28-d9-8a-xx-xx-xx%XXXXXXXX%check#3031#learn#xxxx#xxx#ok%uack
         res(失败): lan_phone%28-d9-8a-xx-xx-xx%XXXXXXXX%check#3031#learn#xxxx#xxx#failed%uack
     """
-    async def ir_learn(self, ir_id, group=DEFAULT_GROUP):
+    async def ir_learn(self, ir_id, group=DEFAULT_GROUP, timeout=30):
         if self.is_support_ir:
             self.ir_learning = True
             cmd = 'operate#3031#learn#%s#%s' % (group, ir_id)
@@ -50,7 +48,7 @@ class IRMixin(metaclass=ABCMeta):
 
             start = time.time()
             while self.ir_learning:
-                if time.time() - start >= 30:
+                if time.time() - start >= timeout:
                     return await self.ir_quit()
                 await asyncio.sleep(1)
                 res = await self.send_message(cmd1, 'uart')

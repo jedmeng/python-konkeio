@@ -6,10 +6,10 @@ SOCKET_COUNT = 3
 
 class Mul(BaseMul):
 
-    def __init__(self, ip):
+    def __init__(self, ip, **kwargs):
+        super().__init__(ip, 'relay', **kwargs)
         self.usb_count = USB_COUNT
         self.usb_status = ['close'] * USB_COUNT
-        super().__init__(ip, 'relay')
 
     @property
     def socket_count(self):

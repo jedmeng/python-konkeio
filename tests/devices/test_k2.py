@@ -185,8 +185,8 @@ async def test_ir(server: MockK2, client: K2):
             assert res is True
         else:
             start = time.time()
-            await client.ir_learn(test_ir_id1, test_group)
-            assert time.time() - start <= 35
+            await client.ir_learn(test_ir_id1, test_group, 10)
+            assert time.time() - start <= 15
 
         await client.ir_quit()
         await client.ir_emit(test_ir_id1, test_group)
@@ -218,8 +218,8 @@ async def test_rf(server: MockK2, client: K2):
             assert res is True
         else:
             start = time.time()
-            await client.rf_learn(test_rf_id1, test_group)
-            assert time.time() - start <= 35
+            await client.rf_learn(test_rf_id1, test_group, 10)
+            assert time.time() - start <= 15
 
         await client.rf_quit()
         await client.rf_emit(test_rf_id1, test_group)

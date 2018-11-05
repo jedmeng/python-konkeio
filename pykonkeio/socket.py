@@ -7,7 +7,7 @@ from . import utils
 
 _PORT = 27431
 
-_LOGGER = logging.getLogger('socket')
+_LOGGER = logging.getLogger(__name__)
 
 _is_start = False
 _device_list = []
@@ -43,7 +43,6 @@ async def _do_receive(loop=None):
         else:
             for callback in _message_handlers:
                 callback(address, *data)
-
     loop = loop or asyncio.get_event_loop()
     loop.add_reader(_sock.fileno(), message_handler, None)
     try:
@@ -73,7 +72,7 @@ async def receive(mac=None, loop=None):
             stop()
 
 
-async def send_message(params, retry=2, loop=None):
+async def send_message(params, retry=2, loop=None, **kwargs):
     if retry <= 0:
         raise error.Timeout('connect timeout')
 

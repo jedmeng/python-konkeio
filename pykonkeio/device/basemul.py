@@ -3,8 +3,8 @@ from .base import BaseDevice
 
 class BaseMul(BaseDevice):
 
-    def __init__(self, ip, device_type='relay'):
-        super().__init__(ip, device_type)
+    def __init__(self, ip, device_type='relay', **kwargs):
+        super().__init__(ip, device_type, **kwargs)
         self.status = list(['close'] * self.socket_count)
 
     @property

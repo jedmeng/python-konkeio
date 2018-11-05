@@ -93,8 +93,8 @@ async def test_ir(server: MockMiniK, client: MiniK):
             assert res is True
         else:
             start = time.time()
-            await client.ir_learn(test_ir_id1, test_group)
-            assert time.time() - start <= 35
+            await client.ir_learn(test_ir_id1, test_group, 10)
+            assert time.time() - start <= 15
 
         await client.ir_quit()
         await client.ir_emit(test_ir_id1, test_group)

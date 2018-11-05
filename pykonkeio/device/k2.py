@@ -5,8 +5,8 @@ from ..mixin.rf import RFMixin
 
 class K2(BaseToggle, IRMixin, RFMixin):
 
-    def __init__(self, ip):
-        super().__init__(ip, 'relay')
+    def __init__(self, ip, **kwargs):
+        super().__init__(ip, 'relay', **kwargs)
         self.light_status = 'close'
         self.usb_status = 'close'
         self.rf_module = False
@@ -22,8 +22,9 @@ class K2(BaseToggle, IRMixin, RFMixin):
 
     async def fetch_info(self):
         status = await super().fetch_info()
-        self.ir_module = status.find('#ir_module#on') > 0
-        self.rf_module = status.find('#rf_module#on') > 0
+        if status:
+            self.ir_module = status.find('#ir_module#on') > 0
+            self.rf_module = status.find('#rf_module#on') > 0
 
     async def do(self, action, value=None):
         if action == 'get_usb_status':
@@ -48,9 +49,15 @@ class K2(BaseToggle, IRMixin, RFMixin):
             return await super().do(action, value)
 
     async def update(self, **kwargs):
-        await super().update(**kwargs)
-        self.usb_status = await self.send_message('check', 'usb', **kwargs)
-        self.light_status = await self.send_message('check', 'light', **kwargs)
+        update_type = kwargs['type']
+        if update_type is None or update_type == 'relay':
+            await super().update(**kwargs)
+
+        if update_type is None or update_type == 'usb':
+            self.usb_status = await self.send_message('check', 'usb', **kwargs)
+
+        if update_type is None or update_type == 'light':
+            self.light_status = await self.send_message('check', 'light', **kwargs)
 
     """
         打开USB

@@ -3,8 +3,8 @@ from ..mixin.ir import IRMixin
 
 
 class MiniK(BaseToggle, IRMixin):
-    def __init__(self, ip):
-        super().__init__(ip)
+    def __init__(self, ip, **kwargs):
+        super().__init__(ip, **kwargs)
         self.is_pro = None
 
     @property
@@ -19,4 +19,5 @@ class MiniK(BaseToggle, IRMixin):
 
     async def fetch_info(self):
         status = await super().fetch_info()
-        self.is_pro = status and status.find('#hv2.') > 0
+        if status:
+            self.is_pro = status.find('#hv2.') > 0

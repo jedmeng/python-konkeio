@@ -41,7 +41,7 @@ class RFMixin(metaclass=ABCMeta):
         res(成功): lan_phone%28-d9-8a-xx-xx-xx%XXXXXXXX%check#3035#learn#xxxx#xxx#ok%uack
         res(失败): lan_phone%28-d9-8a-xx-xx-xx%XXXXXXXX%check#3035#learn#xxxx#xxx#failed%uack
     """
-    async def rf_learn(self, rf_id, group=DEFAULT_GROUP):
+    async def rf_learn(self, rf_id, group=DEFAULT_GROUP, timeout=30):
         if self.is_support_rf:
             self.rf_learning = True
             cmd = 'operate#3035#learn#%s#%s' % (group, rf_id)
@@ -50,7 +50,7 @@ class RFMixin(metaclass=ABCMeta):
 
             start = time.time()
             while self.rf_learning:
-                if time.time() - start >= 30:
+                if time.time() - start >= timeout:
                     return await self.rf_quit()
                 await asyncio.sleep(1)
                 res = await self.send_message(cmd1, 'uart')
