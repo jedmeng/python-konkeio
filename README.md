@@ -3,20 +3,20 @@ This library (and its accompanying cli tool) is used to interface with
 Konke remote-control devices.
 
 ## Supported Devices
+Since some of Konke’s device does not have a clear model, I used internal code to identify it.
 
 ### Socket
-- Mini K `minik`
-- Mini Pro `minik`
-- Smart Plug K(untested) `k1`
-- K2 Pro `k2`
+- Smart Plug K `k1`
+- K2 / K2 Pro `k2`
+- Mini K / Mini Pro `minik`
 
 ### Power Strip
-- The normal one(untested) `micmul`
-- The Standing one with USB support(untested) `mul`
+- The normal one `micmul`
+- The Standing one with USB support `mul`
 
 ### Light
 - KLight (LED with RGB color) `klight`
-- KBlum/K2Light `kbulb`
+- KBulb `kbulb`
 
 ## Install
 
@@ -27,8 +27,14 @@ Konke remote-control devices.
 ## API Reference
 
 ### classes and methods
+- K1(ip)
+    - is_online
+    - status
+    - update()
+    - turn_on()
+    - turn_off()
 - K2(ip)
-    - online
+    - is_online
     - status
     - update()
     - turn_on()
@@ -37,14 +43,32 @@ Konke remote-control devices.
     - turn_off_usb()
     - turn_on_light()
     - turn_off_light()
-- MinkK(ip)
-    - online
+    - is_support_ir()
+    - ir_learn()
+    - ir_quit()
+    - ir_emit()
+    - ir_remove()
+    - ir_remove_group()
+    - is_support_rf()
+    - rf_learn()
+    - rf_quit()
+    - rf_emit()
+    - rf_remove()
+    - rf_remove_group()
+- MinK(ip)
+    - is_online
     - status
     - update()
     - turn_on()
     - turn_off()
+    - is_support_ir()
+    - ir_learn()
+    - ir_quit()
+    - ir_emit()
+    - ir_remove()
+    - ir_remove_group()
 - Mul(ip)
-    - online
+    - is_online
     - status[]
     - usb_status[]
     - update()
@@ -55,7 +79,7 @@ Konke remote-control devices.
     - turn_on_usb(index)
     - turn_off_usb(index)
 - MicMul(ip)
-    - online
+    - is_online
     - status[]
     - update()
     - turn_on(index)
@@ -63,7 +87,7 @@ Konke remote-control devices.
     - turn_on_all()
     - turn_off_all()
 - KLight(ip)
-    - online
+    - is_online
     - status
     - color
     - brightness
@@ -73,7 +97,7 @@ Konke remote-control devices.
     - set_color()
     - set_brightness()
 - KBulb
-    - online
+    - is_online
     - status
     - ct
     - brightness
@@ -91,7 +115,7 @@ Demo:
 
     k2 = K2('192.168.0.222')
 
-    if not k2.online:
+    if not k2.is_online:
         print('switch is off line')
     if k2.status == 'open':
         k2.turn_off()
