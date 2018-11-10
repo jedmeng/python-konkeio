@@ -4,7 +4,6 @@ import asyncio
 
 from . import error
 from . import socket
-from .device import *
 
 _LOGGER = logging.getLogger(__name__)
 _devices = {}
@@ -40,21 +39,31 @@ def get_device(ip, device_type=None):
         return _devices[ip]
 
     if device_type is None:
+        from .device.basetoggle import BaseToggle
         device = BaseToggle(ip)
+    elif device_type == 'k1':
+        from .device.k1 import K1
+        device = K1(ip)
     elif device_type == 'k2':
+        from .device.k2 import K2
         device = K2(ip)
     elif device_type == 'minik':
+        from .device.minik import MiniK
         device = MiniK(ip)
     elif device_type == 'micmul':
+        from .device.micmul import MicMul
         device = MicMul(ip)
     elif device_type == 'mul':
+        from .device.mul import Mul
         device = Mul(ip)
     elif device_type == 'klight':
+        from .device.klight import KLight
         device = KLight(ip)
     elif device_type == 'kbulb':
+        from .device.kbulb import KBulb
         device = KBulb(ip)
     else:
-        raise error.IllegalDevice('device %s not support' % device_type)
+        raise error.DeviceNotSupport('device %s not support' % device_type)
 
     _devices[ip] = device
     return device

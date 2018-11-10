@@ -35,5 +35,10 @@ class MockMiniK(MockBaseDevice):
             else:
                 self.send_message(src, action + '#ok', 'uack')
 
+        if self.is_pro:
+            print("device: %s learning: %s" % (self.status, self.learn_start))
+        else:
+            print("device: %s" % self.status)
+
     def error_message_handler(self, src, mac, password, action, action_type):
         self.send_message(src, action=action, action_type=action_type, mac=mac, password=password, msg_type='lan_phone')

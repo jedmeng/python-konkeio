@@ -19,3 +19,5 @@ class MockMicMul(MockBaseDevice):
         elif action in ['openall', 'closeall']:
             self.status = list(action[0:-3] for _ in self.status)
             self.send_message(src, 'x', 'rack')
+
+        print("status: %s" % ', '.join(self.status))

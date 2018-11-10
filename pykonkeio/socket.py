@@ -9,8 +9,8 @@ _PORT = 27431
 
 _LOGGER = logging.getLogger(__name__)
 
-_is_start = False
-_device_list = []
+_requests = []
+_receivers_count = 0
 _message_handlers = []
 _receive_task = None
 
@@ -19,10 +19,7 @@ _sock.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
 _sock.setblocking(False)
 
 
-def send(ip, mac, password, action, action_type, device_type='lan_phone', loop=None):
-    if not _is_start:
-        start(loop=loop)
-
+def send(ip, mac, password, action, action_type, device_type='lan_phone'):
     address = (ip, _PORT)
     cmd = '%s%%%s%%%s%%%s%%%s' % (device_type, mac, password, action, action_type)
     message = utils.encrypt(cmd)
@@ -37,72 +34,69 @@ async def _do_receive(loop=None):
         _LOGGER.debug('receive %s %s', address, message or '(empty)')
 
         device, *data = message.split('%')
-
         if len(data) < 4 or device != 'lan_device':
-            _LOGGER.error('incorrect response %s', message)
-        else:
-            for callback in _message_handlers:
-                callback(address, *data)
+            return _LOGGER.error('incorrect response %s', message)
+
+        mac, _, _, response_type = data
+
+        for request in _requests:
+            if not request['future'].done() and request['mac'] == mac and request['request_type'].startswith(response_type[:-3]):
+                request['future'].set_result((address, *data))
+                break
+
+        for callback in _message_handlers:
+            callback(address, *data)
+
     loop = loop or asyncio.get_event_loop()
     loop.add_reader(_sock.fileno(), message_handler, None)
+
     try:
         await asyncio.sleep(math.inf)
     except asyncio.CancelledError:
         loop.remove_reader(_sock.fileno())
 
 
-async def receive(mac=None, loop=None):
-    if not _is_start:
-        start(loop=loop)
-    future = asyncio.Future(loop=loop)
+async def send_message(params, retry=2, loop=None, **kwargs):
+    request = {
+        'mac': params[1],
+        'request_type': params[4],
+        'future': asyncio.Future(loop=loop)
+    }
+    _requests.append(request)
 
-    def message_handler(*data):
-        if mac is None or mac == data[1]:
-            future.set_result(data)
-
-    _message_handlers.append(message_handler)
+    send(*params)
+    add_receiver(loop=loop)
 
     try:
-        return await asyncio.wait_for(future, timeout=1)
+        return await asyncio.wait_for(request['future'], timeout=1)
     except asyncio.TimeoutError:
+        if retry > 0:
+            return await send_message(params, retry=retry-1, loop=loop)
         raise error.Timeout('connect timeout')
     finally:
-        _message_handlers.remove(message_handler)
-        if len(_message_handlers) == 0:
-            stop()
+        _requests.remove(request)
+        remove_receiver()
 
 
-async def send_message(params, retry=2, loop=None, **kwargs):
-    if retry <= 0:
-        raise error.Timeout('connect timeout')
-
-    send(*params, loop=loop)
-
-    while True:
-        try:
-            data = await receive(params[1], loop=loop)
-        except error.Timeout:
-            return await send_message(params, retry=retry - 1, loop=loop)
-
-        if data[4][0] == params[4][0] and data[4][-3:] == 'ack':
-            return data
-
-
-def add_message_handler(handler):
+def add_message_handler(handler, loop=None):
     _message_handlers.append(handler)
+    add_receiver(loop=loop)
 
 
 def remove_message_handler(handler):
     _message_handlers.remove(handler)
+    remove_receiver()
 
 
-def start(loop=None):
-    global _is_start, _receive_task
-    _is_start = True
-    _receive_task = asyncio.ensure_future(_do_receive(loop=loop))
+def add_receiver(loop=None):
+    global _receivers_count, _receive_task
+    if _receivers_count == 0:
+        _receive_task = asyncio.ensure_future(_do_receive(loop=loop))
+    _receivers_count += 1
 
 
-def stop():
-    global _is_start, _receive_task
-    _is_start = False
-    _receive_task and _receive_task.cancel()
+def remove_receiver():
+    global _receivers_count
+    _receivers_count -= 1
+    if _receivers_count == 0:
+        _receive_task and _receive_task.cancel()

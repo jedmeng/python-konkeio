@@ -31,7 +31,7 @@ class KLight(BaseToggle):
     """
     async def update(self, **kwargs):
         if not self.is_online:
-            super().update(**kwargs)
+            await super().update(**kwargs)
         try:
             m1, m2, *_ = (await self.send_message('check', **kwargs)).split('&')
 
@@ -55,10 +55,15 @@ class KLight(BaseToggle):
         except ValueError:
             raise error.IllegalValue('brightness should between 0 and 100')
 
-        if self.brightness != int(w):
-            [r, g, b] = self.color
-            await self.send_message('set#%s#%s#%s#%s#1,%s#1' % (r, g, b, w, self.m), **kwargs)
-            self.brightness = int(w)
+        if self.brightness == int(w):
+            return
+
+        [r, g, b] = self.color
+        await self.send_message('set#%s#%s#%s#%s#1,%s#1' % (r, g, b, w, self.m), **kwargs)
+        self.brightness = int(w)
+
+        if self.brightness == 0:
+            await self.turn_off()
 
     """
         调整颜色
@@ -75,3 +80,10 @@ class KLight(BaseToggle):
         if self.color != [int(r), int(g), int(b)]:
             await self.send_message('set#%s#%s#%s#%s#1,%s#1' % (r, g, b, self.brightness, self.m), **kwargs)
             self.color = [int(r), int(g), int(b)]
+
+    async def turn_on(self, **kwargs):
+        await super().turn_on(**kwargs)
+        if self.brightness == 0:
+            await self.set_brightness(50)
+
+        # @todo rgb 0,0,0

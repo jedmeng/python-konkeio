@@ -29,7 +29,7 @@ class KBulb(BaseToggle):
         req: lan_phone%28-d9-8a-xx-xx-xx%XXXXXXXX%check%kbulb
         res: lan_device%28-d9-8a-xx-xx-xx%nopassword%open#2700,100,0&5161,50,6%kback
     """
-    async def update(self):
+    async def update(self, **kwargs):
         try:
             info = (await self.send_message('check')).split('&')
 
@@ -54,11 +54,16 @@ class KBulb(BaseToggle):
         except ValueError:
             raise error.IllegalValue('brightness should between 0 and 100')
 
-        if self.brightness != int(w):
-            await self.set_mode(1)
-            await self.send_message('set#lum#%s' % w)
-            self.brightness = int(w)
-            self.status = 'open'
+        if self.brightness == int(w):
+            return
+
+        await self.set_mode(1)
+        await self.send_message('set#lum#%s' % w)
+        self.brightness = int(w)
+        self.status = 'open'
+
+        if self.brightness == 0:
+            await self.turn_off()
 
     """
         调整色温
@@ -89,3 +94,8 @@ class KBulb(BaseToggle):
         if self.mode != int(mode):
             await self.send_message('set#mode#%s' % mode)
             self.mode = int(mode)
+
+    async def turn_on(self, **kwargs):
+        await super().turn_on(**kwargs)
+        if self.brightness == 0:
+            await self.set_brightness(50)

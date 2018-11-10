@@ -21,7 +21,7 @@ class ErrorMessageFormat(KonkeError):
         super().__init__(message)
 
 
-class IllegalDevice(KonkeError):
+class DeviceNotSupport(KonkeError):
     def __init__(self, message='device not support'):
         super().__init__(message)
 

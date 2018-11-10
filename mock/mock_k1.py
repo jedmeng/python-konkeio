@@ -20,3 +20,5 @@ class MockK1(MockBaseDevice):
         elif action[0:7] == 'confirm':
             self.status = self.actions[action[8:]]
             self.send_message(src, self.status, 'rack')
+
+        print("device: %s" % self.status)

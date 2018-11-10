@@ -49,7 +49,8 @@ class K2(BaseToggle, IRMixin, RFMixin):
             return await super().do(action, value)
 
     async def update(self, **kwargs):
-        update_type = kwargs['type']
+        update_type = kwargs['type'] if hasattr(kwargs, 'type') else None
+
         if update_type is None or update_type == 'relay':
             await super().update(**kwargs)
 

@@ -1,6 +1,6 @@
 from .mock_base_device import MockBaseDevice
 
-SOCKET_COUNT = 4
+SOCKET_COUNT = 3
 USB_COUNT = 2
 
 
@@ -28,3 +28,5 @@ class MockMul(MockBaseDevice):
             index = int(action[-1]) - 1
             self.usb_status[index] = action[0:-1]
             self.send_message(src, self.usb_status[index], 'uack')
+
+        print("status: %s usb_status: %s" % (', '.join(self.status), ', '.join(self.usb_status)))

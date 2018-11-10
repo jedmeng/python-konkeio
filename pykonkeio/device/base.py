@@ -15,8 +15,8 @@ class BaseDevice(object):
 
     async def fetch_info(self):
         try:
-            self.is_online = True
             _, self.mac, self.password, status, _ = await manager.get_device_info(self.ip)
+            self.is_online = True
             return status
         except error.Timeout:
             self.is_online = False

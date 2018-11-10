@@ -22,3 +22,6 @@ class MockKLight(MockBaseDevice):
             self.color = (r, g, b)
             self.brightness = brightness
             self.send_message(src, 'x', 'klack')
+
+        print("light: %s brightness: %s color: %s, %s, %s" %
+              (self.status, self.brightness, self.color[0], self.color[1], self.color[2]))

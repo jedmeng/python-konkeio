@@ -3,7 +3,7 @@ This library (and its accompanying cli tool) is used to interface with
 Konke remote-control devices.
 
 ## Supported Devices
-Since some of Konke’s device does not have a clear model, I used internal code to identify it.
+Since some of Konke's device does not have a clear model, I used internal code to identify it.
 
 ### Socket
 - Smart Plug K `k1`

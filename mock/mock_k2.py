@@ -70,3 +70,5 @@ class MockK2(MockBaseDevice):
                 self.send_message(src, action + '#failed', 'uack')
             else:
                 self.send_message(src, action + '#ok', 'uack')
+
+        print("device: %s usb: %s light: %s" % (self.status, self.usb_status, self.light_status))

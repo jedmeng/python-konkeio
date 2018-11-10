@@ -23,3 +23,5 @@ class MockKBulb(MockBaseDevice):
                 self.ct = value
             self.send_message(src, action, 'kback')
             self.status = 'open'
+
+        print("light: %s brightness: %s ct: %s" % (self.status, self.brightness, self.ct))
