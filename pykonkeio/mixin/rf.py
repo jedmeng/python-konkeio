@@ -44,6 +44,7 @@ class RFMixin(metaclass=ABCMeta):
     async def rf_learn(self, rf_id, group=DEFAULT_GROUP, timeout=30):
         if self.is_support_rf:
             self.rf_learning = True
+            await self.rf_remove(rf_id, group)
             cmd = 'operate#3035#learn#%s#%s' % (group, rf_id)
             cmd1 = 'check#3035#learn#%s#%s' % (group, rf_id)
             await self.send_message(cmd, 'uart')

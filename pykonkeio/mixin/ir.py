@@ -42,6 +42,7 @@ class IRMixin:
     async def ir_learn(self, ir_id, group=DEFAULT_GROUP, timeout=30):
         if self.is_support_ir:
             self.ir_learning = True
+            await self.ir_remove(ir_id, group)
             cmd = 'operate#3031#learn#%s#%s' % (group, ir_id)
             cmd1 = 'check#3031#learn#%s#%s' % (group, ir_id)
             await self.send_message(cmd, 'uart')
@@ -83,7 +84,7 @@ class IRMixin:
     """
     async def ir_remove(self, ir_id, group=DEFAULT_GROUP):
         if self.is_support_ir:
-            cmd = 'operate#3031#deletekey#%s#%s' % (ir_id, group)
+            cmd = 'operate#3031#deletekey#%s#%s' % (group, ir_id)
             await self.send_message(cmd, 'uart')
 
     """
