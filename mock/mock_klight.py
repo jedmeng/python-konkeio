@@ -11,7 +11,7 @@ class MockKLight(MockBaseDevice):
     def message_handler(self, src, action, device_type):
         if action == 'check' and device_type == 'klight':
             r, g, b = self.color
-            status = '%s#x#x#x#x#1,x#1&#%d#%d#%d#%d#2,x#1&#x#x#x#x#3,x#1&#x#x#x#x#5,x#1' % \
+            status = '%s#255#255#255#90#1,0#1&%d#%d#%d#%d#2,0.00#1&247#190#13#11#3,3.02#1&5,50#1&1' % \
                      (self.status, int(r), int(g), int(b), int(self.brightness))
             self.send_message(src, status, 'klack')
         elif action in ['open', 'close'] and device_type == 'klight':
