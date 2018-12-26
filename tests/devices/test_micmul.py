@@ -95,14 +95,14 @@ async def test_update(server: MockMicMul, client: MicMul):
     else:
         await client.turn_off_all()
         await client.update()
-        assert client.status == 'close'
+        assert client.status == list(['close'] * client.socket_count)
 
         await client.turn_on_all()
         await client.update()
-        assert client.status == 'open'
+        assert client.status == list(['open'] * client.socket_count)
 
         status = ['open'] * client.socket_count
-        for i in client.status:
+        for i, _ in enumerate(client.status):
             if random.choice((True, False)):
                 await client.turn_off(i)
                 status[i] = 'close'
@@ -111,4 +111,4 @@ async def test_update(server: MockMicMul, client: MicMul):
 
         await client.turn_off_all()
         await client.update()
-        assert client.status == 'close'
+        assert client.status == list(['close'] * client.socket_count)

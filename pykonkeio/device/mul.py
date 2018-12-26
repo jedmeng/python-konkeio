@@ -42,8 +42,9 @@ class Mul(BaseMul):
     """
     async def update(self, **kwargs):
         await super().update(**kwargs)
-
-        for index, t in enumerate((await self.send_message('check', 'usb', **kwargs)).split(',')):
+        res = await self.send_message('check', 'usb', **kwargs)
+        usb_status = res.split(',')
+        for index, t in enumerate(usb_status[:self.usb_count]):
             self.usb_status[index] = t[:-1]
 
     """

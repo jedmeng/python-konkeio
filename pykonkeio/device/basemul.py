@@ -43,7 +43,8 @@ class BaseMul(BaseDevice):
 
     async def update(self, **kwargs):
         res = await self.send_message('check', **kwargs)
-        for index, t in enumerate(res.split(',')):
+        status = res.split(',')
+        for index, t in enumerate(status[:self.socket_count]):
             self.status[index] = t[:-1]
 
     """
