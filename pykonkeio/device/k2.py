@@ -49,16 +49,17 @@ class K2(BaseToggle, IRMixin, RFMixin):
             return await super().do(action, value)
 
     async def update(self, **kwargs):
-        update_type = kwargs['type'] if hasattr(kwargs, 'type') else None
+        if self.is_updating:
+            return
+        else:
+            self.is_updating = True
 
-        if update_type is None or update_type == 'relay':
-            await super().update(**kwargs)
+        await super().update(update_flag=False, **kwargs)
 
-        if update_type is None or update_type == 'usb':
-            self.usb_status = await self.send_message('check', 'usb', **kwargs)
+        self.usb_status = await self.send_message('check', 'usb', **kwargs)
+        self.light_status = await self.send_message('check', 'light', **kwargs)
 
-        if update_type is None or update_type == 'light':
-            self.light_status = await self.send_message('check', 'light', **kwargs)
+        self.is_updating = False
 
     """
         打开USB

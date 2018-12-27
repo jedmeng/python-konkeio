@@ -38,19 +38,28 @@ class BaseMul(BaseDevice):
     """
         获取状态
         req: lan_phone%28-d9-8a-XX-XX-XX%XXXXXXXX%check%relay
-        res: lan_device%28-d9-8a-xx-xx-xx%nopassword%open1,close2,open3,close4%rack
+        res: lan_device%28-d9-8a-xx-xx-xx%nopassword%open1,close2,open3,close4,unlock1,unlock2,unlock3,unlock4%rack
     """
 
-    async def update(self, **kwargs):
+    async def update(self, update_flag=True, **kwargs):
+        if update_flag:
+            if self.is_updating:
+                return
+            else:
+                self.is_updating = True
+
         res = await self.send_message('check', **kwargs)
         status = res.split(',')
         for index, t in enumerate(status[:self.socket_count]):
             self.status[index] = t[:-1]
 
+        if update_flag:
+            self.is_updating = False
+
     """
         开启插孔
         req: lan_phone%28-d9-8a-XX-XX-XX%XXXXXXXX%openX%relay
-        res: lan_device%28-d9-8a-xx-xx-xx%nopassword%open%rack
+        res: lan_device%28-d9-8a-xx-xx-xx%nopassword%open1,close2,open3,close4,unlock1,unlock2,unlock3,unlock4%rack
     """
 
     async def turn_on(self, index, **kwargs):
@@ -61,7 +70,7 @@ class BaseMul(BaseDevice):
     """
         关闭插孔
         req: lan_phone%28-d9-8a-xx-xx-xx%XXXXXXXX%closeX%relay
-        res: lan_device%28-d9-8a-xx-xx-xx%nopassword%close%rack
+        res: lan_device%28-d9-8a-xx-xx-xx%nopassword%open1,close2,open3,close4,unlock1,unlock2,unlock3,unlock4%rack
     """
 
     async def turn_off(self, index, **kwargs):
@@ -72,7 +81,7 @@ class BaseMul(BaseDevice):
     """
         全部开启
         req: lan_phone%28-d9-8a-xx-xx-xx%XXXXXXXX%openall%relay
-        res: lan_device%28-d9-8a-xx-xx-xx%nopassword%close%rack
+        res: lan_device%28-d9-8a-xx-xx-xx%nopassword%open1,close2,open3,close4,unlock1,unlock2,unlock3,unlock4%rack
     """
 
     async def turn_on_all(self, **kwargs):
@@ -83,7 +92,7 @@ class BaseMul(BaseDevice):
     """
         全部关闭
         req: lan_phone%28-d9-8a-xx-xx-xx%XXXXXXXX%closeall%relay
-        res: lan_device%28-d9-8a-xx-xx-xx%nopassword%close%rack
+        res: lan_device%28-d9-8a-xx-xx-xx%nopassword%open1,close2,open3,close4,unlock1,unlock2,unlock3,unlock4%rack
     """
 
     async def turn_off_all(self, **kwargs):

@@ -41,11 +41,18 @@ class Mul(BaseMul):
         res: lan_device%28-d9-8a-xx-xx-xx%nopassword%open1,close2%uack
     """
     async def update(self, **kwargs):
-        await super().update(**kwargs)
+        if self.is_updating:
+            return
+        else:
+            self.is_updating = True
+
+        await super().update(update_flag=False, **kwargs)
         res = await self.send_message('check', 'usb', **kwargs)
         usb_status = res.split(',')
         for index, t in enumerate(usb_status[:self.usb_count]):
             self.usb_status[index] = t[:-1]
+
+        self.is_updating = False
 
     """
         打开USB

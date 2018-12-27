@@ -30,8 +30,11 @@ class KLight(BaseToggle):
              close#255#255#255#90#1,0#1&16#16#17#100#2,0.00#1&247#190#13#11#3,3.02#1&5,50#1&1%klack
     """
     async def update(self, **kwargs):
-        if not self.is_online:
-            await super().update(**kwargs)
+        if self.is_updating:
+            return
+        else:
+            self.is_updating = True
+
         try:
             m1, m2, *_ = (await self.send_message('check', **kwargs)).split('&')
 
@@ -42,6 +45,8 @@ class KLight(BaseToggle):
             self.brightness = int(w)
         except ValueError:
             raise error.ErrorMessageFormat
+        finally:
+            self.is_updating = False
 
     """
         调整亮度
@@ -79,9 +84,12 @@ class KLight(BaseToggle):
             await self.send_message('set#%s#%s#%s#%s#2,0#1' % (r, g, b, self.brightness), **kwargs)
             self.color = [int(r), int(g), int(b)]
 
+        if self.color == [0, 0, 0]:
+            await self.turn_off()
+
     async def turn_on(self, **kwargs):
         await super().turn_on(**kwargs)
         if self.brightness == 0:
             await self.set_brightness(50)
-
-        # @todo rgb 0,0,0
+        if self.color == [0, 0, 0]:
+            await self.set_color(255, 255, 255)

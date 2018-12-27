@@ -22,8 +22,17 @@ class BaseToggle(BaseDevice):
         req: lan_phone%28-d9-8a-xx-xx-xx%XXXXXXXX%check%relay
         res: lan_device%28-d9-8a-xx-xx-xx%nopassword%check%rack
     """
-    async def update(self, **kwargs):
+    async def update(self, update_flag=True, **kwargs):
+        if update_flag:
+            if self.is_updating:
+                return
+            else:
+                self.is_updating = True
+
         self.status = await self.send_message('check', **kwargs)
+
+        if update_flag:
+            self.is_updating = False
 
     """
         打开开关

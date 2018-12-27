@@ -10,6 +10,11 @@ class MockMul(MockBaseDevice):
         self.status = list(init_status or ['close'] * SOCKET_COUNT)
         self.usb_status = list(usb_status or ['close'] * USB_COUNT)
 
+    def build_status(self):
+        open_status = ','.join('%s%d' % (val, index + 1) for index, val in enumerate(self.status))
+        lock_status = ','.join('unlock%d' % (index + 1) for index, _ in enumerate(self.status))
+        return '%s,%s' % (open_status, lock_status)
+
     def message_handler(self, src, action, device_type):
         if action == 'check' and device_type == 'relay':
             status = ','.join('%s%d' % (val, index + 1) for index, val in enumerate(self.status))

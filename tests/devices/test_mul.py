@@ -131,15 +131,15 @@ async def test_update(server: MockMul, client: Mul):
         for i in client.usb_status:
             await client.turn_off_usb(i)
         await client.update()
-        assert client.status == 'close'
-        assert client.usb_status == 'close'
+        assert client.status == list(['close'] * client.socket_count)
+        assert client.usb_status == list(['close'] * client.usb_count)
 
         await client.turn_on_all()
         for i in client.usb_status:
             await client.turn_on_usb(i)
         await client.update()
-        assert client.status == 'open'
-        assert client.usb_status == 'open'
+        assert client.status == list(['open'] * client.socket_count)
+        assert client.usb_status == list(['open'] * client.usb_count)
 
         status = ['open'] * client.socket_count
         usb_status = ['open'] * client.usb_count
@@ -159,8 +159,8 @@ async def test_update(server: MockMul, client: Mul):
         for i in client.usb_status:
             await client.turn_off_usb(i)
         await client.update()
-        assert client.status == 'close'
-        assert client.usb_status == 'close'
+        assert client.status == list(['close'] * client.socket_count)
+        assert client.usb_status == list(['close'] * client.usb_count)
 
 
 

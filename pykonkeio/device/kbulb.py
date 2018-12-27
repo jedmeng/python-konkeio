@@ -30,6 +30,11 @@ class KBulb(BaseToggle):
         res: lan_device%28-d9-8a-xx-xx-xx%nopassword%open#2700,100,0&5161,50,6%kback
     """
     async def update(self, **kwargs):
+        if self.is_updating:
+            return
+        else:
+            self.is_updating = True
+
         try:
             info = (await self.send_message('check')).split('&')
 
@@ -42,6 +47,8 @@ class KBulb(BaseToggle):
             self.mode = int(mode)
         except ValueError:
             raise error.ErrorMessageFormat
+        finally:
+            self.is_updating = False
 
     """
         调整亮度
